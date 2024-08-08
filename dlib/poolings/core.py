@@ -291,6 +291,31 @@ class PRM(_BasicPooler):
                           self.prm_st, self.support_background)
 
 
+class PixelWise(_BasicPooler):
+    def __init__(self, **kwargs):
+        super(PixelWise, self).__init__(**kwargs)
+        self.name = 'PixelWise'
+
+        classes = self.classes
+        if self.support_background:
+            classes = classes + 1
+
+        self.conv = nn.Conv2d(self.in_channels, out_channels=classes,
+                              kernel_size=1)
+
+    def freeze_cl_hypothesis(self):
+        # SFUDA: freeze the last linear weights + bias of the classifier
+        self.freeze_part(self.conv)  
+        
+    def forward(self, x: torch.Tensor, return_cams:bool=False) -> torch.Tensor:
+        self.assert_x(x)
+
+        logits = self.conv(x)
+        if return_cams:
+            self.cams = logits
+        return logits
+    
+
 if __name__ == '__main__':
     from dlib.utils.shared import announce_msg
     from dlib.utils.reproducibility import set_seed

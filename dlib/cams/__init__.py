@@ -36,6 +36,7 @@ from dlib.cams.builtincam import ReadyCam
 from dlib.cams.builtincam import DeepMILCam
 from dlib.cams.builtincam import MaxMinCam
 from dlib.cams.builtincam import SegmentationCam
+from dlib.cams.builtincam import EnergyCAM
 
 
 from dlib.configure import constants
@@ -60,6 +61,10 @@ def build_seg_extractor(model, args):
 
 
 def build_std_cam_extractor(classifier, args):
+
+    if args.pixel_wise_classification:
+        return EnergyCAM(model=classifier)
+
     p1 = [constants.GAP, constants.MAXPOOL, constants.WILDCATHEAD,
           constants.LSEPOOL, constants.PRM]
     mbin1 = [constants.METHOD_WILDCAT, constants.METHOD_GAP,

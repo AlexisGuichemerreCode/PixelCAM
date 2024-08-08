@@ -1,0 +1,40 @@
+DLLL 2024-07-31 18:05:48.982829 0:00:00.161577 
+===================================================================================================
+ TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: CAMELYON512 	 METHOD: GRADCAMPP 	 ENCODER: RESNET50 	
+===================================================================================================
+
+DLLL 2024-07-31 18:05:49.780742 0:00:00.959490 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 23514179
+DLLL 2024-07-31 18:05:49.780902 0:00:00.959650 Arch: STDClassifier
+task: STD_CL
+encoder_name: resnet50
+encoder_weights: imagenet
+classes: 2
+aux_params: 
+	classes: 2
+	modalities: 5
+	kmax: 0.5
+	kmin: 0.1
+	alpha: 0.6
+	dropout: 0.0
+	support_background: True
+	r: 10.0
+	mid_channels: 128
+	gated: False
+	prm_ks: 3
+	prm_st: 1
+scale_in: 1.0
+freeze_cl: False
+im_rec: False
+img_range: tanh 
+
+DLLL 2024-07-31 18:05:49.786738 0:00:00.965486 u-resnet50. Task: STD_CL. 
+ NBR-PARAMS: 
+	Encoder [resnet50]: 23508032. 
+	Classification head [WGAP]: 6147. 
+	Total: 23514179. 
+
+DLLL 2024-07-31 18:05:49.887438 0:00:01.066186 
+========================================================================================================================
+ MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/HISTOLOGY_PROJECT/MODEL_BENCHMARK_SFUDA/SOURCE_MODELS/BLOC/CAMELYON512/ID_SOURCE_13_CAMELYON512_GRADCAMPP_2-TSK_STD_CL-DS_CAMELYON512-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_GRADCAMPP-SPOOLING_WGAP-ARCH_STDCLASSIFIER-ECD_RESNET50/CAMELYON512-0-RESNET50-GRADCAMPP-WGAP-CP_BEST_LOCALIZATION
+========================================================================================================================
+

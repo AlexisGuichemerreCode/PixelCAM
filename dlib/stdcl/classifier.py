@@ -31,7 +31,8 @@ class STDClassifier(STDClModel):
         in_channels: int = 3,
         aux_params: Optional[dict] = None,
         scale_in: float = 1.,
-        spatial_dropout: float = 0.0
+        spatial_dropout: float = 0.0,
+        pixel_wise_classification: bool = False  # Add this parameter to control the creation of the second head for localization for Energy Model
     ):
         super(STDClassifier, self).__init__()
 
@@ -64,6 +65,12 @@ class STDClassifier(STDClModel):
         self.classification_head = poolings.__dict__[pooling_head](
             in_channels=self.encoder.out_channels[-1], **aux_params
         )
+
+        # If pixel_wise_classification is True, create the second head
+        if pixel_wise_classification:
+            self.pixel_wise_classification_head = poolings.__dict__['PixelWise'](
+                in_channels=self.encoder.out_channels[-1], **aux_params
+            )
 
         self.name = "u-{}".format(encoder_name)
         self.initialize()

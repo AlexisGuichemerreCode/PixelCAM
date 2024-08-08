@@ -688,6 +688,77 @@ class ResNet50Adl(CoreClassifier):
             layers.append(block(self.inplanes, planes))
         return layers
 
+class ResNet50Energy(CoreClassifier):
+    def __init__(self, num_classes=1000, large_feature_map=False, **kwargs):
+        super(ResNet50Energy, self).__init__()
+        block = Bottleneck
+        layers = [3, 4, 6, 3]
+
+        stride_l3 = 1 if large_feature_map else 2
+        self.inplanes = 64
+
+        self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=7, stride=2,
+                               padding=3, bias=False)
+        self.bn1 = nn.BatchNorm2d(self.inplanes)
+        self.relu = nn.ReLU(inplace=False)
+        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+
+        self.layer1 = self._make_layer(block, 64, layers[0], stride=1)
+        self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
+        self.layer3 = self._make_layer(block, 256, layers[2], stride=stride_l3)
+        self.layer4 = self._make_layer(block, 512, layers[3], stride=1)
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.fc = nn.Linear(512 * block.expansion, num_classes)
+        print(self.fc.weight.shape)
+
+        self.cl2 = nn.Linear(512 * block.expansion, num_classes)
+
+        initialize_weights(self.modules(), init_mode='xavier')
+
+    def forward(self, x, labels=None, return_cam=False):
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
+        x = self.maxpool(x)
+
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        print(x.shape)
+
+        pre_logit = self.avgpool(x)
+        pre_logit = pre_logit.reshape(pre_logit.size(0), -1)
+        logits = self.fc(pre_logit)
+
+        if return_cam:
+            feature_map = x.detach().clone()
+            cam_weights = self.fc.weight[labels]
+            print(cam_weights.shape, cam_weights.view(*feature_map.shape[:2],
+                                                      1, 1).shape)
+            print((cam_weights.view(*feature_map.shape[:2], 1, 1) *
+                    feature_map).shape)
+            cams = (cam_weights.view(*feature_map.shape[:2], 1, 1) *
+                    feature_map).mean(1, keepdim=False)
+            return cams
+            
+        return {'logits': logits, 'binary_logits': self.cl2(pre_logit)}
+
+    def _make_layer(self, block, planes, blocks, stride):
+        layers = self._layer(block, planes, blocks, stride)
+        return nn.Sequential(*layers)
+
+    def _layer(self, block, planes, blocks, stride):
+        downsample = get_downsampling_layer(self.inplanes, block, planes,
+                                            stride)
+
+        layers = [block(self.inplanes, planes, stride, downsample)]
+        self.inplanes = planes * block.expansion
+        for _ in range(1, blocks):
+            layers.append(block(self.inplanes, planes))
+
+        return layers
+
 
 def get_downsampling_layer(inplanes, block, planes, stride):
     outplanes = planes * block.expansion

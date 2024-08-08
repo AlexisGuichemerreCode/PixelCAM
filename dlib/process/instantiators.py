@@ -1000,6 +1000,7 @@ def get_model(args, eval=False, eval_path_weights=''):
                     drop_rate=args.sat_drop_rate,
                     drop_path_rate=args.sat_drop_path_rate
                 )
+
             else:
                 raise ValueError
         elif args.method == constants.METHOD_MAXMIN:
@@ -1021,6 +1022,22 @@ def get_model(args, eval=False, eval_path_weights=''):
                 w=args.maxmin_w,
                 dataset_name=args.dataset
             )
+            
+        elif args.method == constants.METHOD_ENERGY:
+                aux_params = get_aux_params(args)
+                model = create_model(
+                    task=args.task,
+                    arch=p.arch,
+                    method=args.method,
+                    encoder_name=p.encoder_name,
+                    encoder_weights=encoder_weights,
+                    in_channels=p.in_channels,
+                    encoder_depth=encoder_depth,
+                    scale_in=p.scale_in,
+                    spatial_dropout=p.spatial_dropout,
+                    aux_params=aux_params,
+                    pixel_wise_classification=args.pixel_wise_classification
+                )
         else:
             aux_params = get_aux_params(args)
             model = create_model(

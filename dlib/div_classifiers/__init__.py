@@ -6,6 +6,7 @@ root_dir = dirname(dirname(abspath(__file__)))
 sys.path.append(root_dir)
 
 from dlib.div_classifiers.resnet import ResNet50Spg
+from dlib.div_classifiers.resnet import ResNet50Energy
 from dlib.div_classifiers.resnet import ResNet50Adl
 from dlib.div_classifiers.resnet import ResNet50Acol
 
@@ -32,6 +33,9 @@ models = dict()
 for method in [constants.METHOD_SPG, constants.METHOD_ADL,
                constants.METHOD_ACOL]:
     models[method] = dict()
+
+#models[constants.METHOD_ENERGY] = dict()
+#models[constants.METHOD_ENERGY][constants.RESNET50_ENERGY] = ResNet50Energy
 
 models[constants.METHOD_SPG][constants.RESNET50] = ResNet50Spg
 models[constants.METHOD_SPG][constants.INCEPTIONV3] = InceptionV3Spg

@@ -529,6 +529,101 @@ class SegmentationCam:
         return f"{self.__class__.__name__}({self.extra_repr()})"
 
 
+class EnergyCAM:
+    """Extract CAM frpm segmentation model.
+
+    Args:
+        model: input model
+        target_layer: name of the target layer
+        input_shape: shape of the expected input tensor excluding the batch
+         dimension
+    """
+
+    def __init__(
+        self,
+        model: Union[UnetFCAM, UnetNEGEV, Unet]
+    ) -> None:
+
+        self.assert_model(model)
+
+        self.model = model
+        
+
+    @staticmethod
+    def assert_model(model: Union[UnetFCAM, Unet]) -> None:
+        # _model = model if not isinstance(model, DDP) else model.module
+
+        _model = model
+
+        # assert isinstance(_model, UnetFCAM), type(model)
+
+        assert any([isinstance(_model.encoder,
+                               dlib.encoders.resnet.ResNetEncoder),
+                    isinstance(_model.encoder, dlib.encoders.vgg.VGGEncoder),
+                    isinstance(_model.encoder,
+                               dlib.encoders.inceptionv3.InceptionV3Encoder)])
+
+    @staticmethod
+    def _normalize(cams: Tensor, spatial_dims: Optional[int] = None) -> Tensor:
+        """CAM normalization"""
+        spatial_dims = cams.ndim if spatial_dims is None else spatial_dims
+        cams.sub_(cams.flatten(start_dim=-spatial_dims).min(-1).values[(...,) + (None,) * spatial_dims])
+        cams.div_(cams.flatten(start_dim=-spatial_dims).max(-1).values[(...,) + (None,) * spatial_dims])
+
+        return cams
+
+    def __call__(self,
+                 image: Tensor,
+                 class_idx: Optional[int] = None,
+                 scores: Optional[Tensor] = None,
+                 normalized: bool = True,
+                 reshape: Optional[Tuple] = None,
+                 argmax: bool = False) -> Tensor:
+
+        # Compute CAM: (h, w)
+        cam = self.compute_cams(image, argmax=argmax)
+        if reshape is not None:
+            assert len(reshape) == 2
+            cam = F.interpolate(cam.unsqueeze(0).unsqueeze(0),
+                                reshape,
+                                mode='bilinear',
+                                align_corners=False).squeeze(0).squeeze(0)
+        return cam
+
+    def compute_cams(self, argmax: bool = False) -> Tensor:
+        """Compute the CAM for a specific output class
+
+        Args:
+            argmax (bool, optional): if true, we compute the argmax over the
+            segmentation cams to get a binary map where 1 is foreground and 0
+            is background. if false, we return the normalize cam at index 1.
+            the segmentation cams are normalized using softmax.
+
+        Returns:
+            torch.Tensor[M, N]: class activation map of hooked conv layer
+        """
+
+        cams = self.model.cams
+        cams = cams.float()
+
+        assert cams.ndim == 4
+        assert cams.shape[0] == 1
+        assert cams.shape[1] == 2
+
+        if argmax:
+            cam = torch.argmax(cams, dim=1).squeeze(0).float()  # (h, w)
+        else:
+            cam = torch.softmax(cams, dim=1)[:, 1, :, :].squeeze(0)  # (h, w)
+
+        return cam
+
+    def extra_repr(self) -> str:
+        return f""
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.extra_repr()})"
+
+
 if __name__ == "__main__":
     import itertools
     import datetime as dt

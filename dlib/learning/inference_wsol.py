@@ -106,7 +106,7 @@ class CAMComputer(object):
                  cam_curve_interval: float = .001,
                  out_folder=None,
                  fcam_argmax: bool = False,
-                 best_valid_tau: float = None
+                 best_valid_tau: float = None,
                  ):
         self.args = args
         self.model = model
@@ -200,6 +200,17 @@ class CAMComputer(object):
                 output = self.model(image)
 
         if self.args.task == constants.STD_CL:
+
+            if self.args.pixel_wise_classification:
+                cl_logits = output
+                cam = self.std_cam_extractor(
+                                        class_idx=target,
+                                         normalized=True,
+                                         reshape=img_shape if self.special1
+                                         else None)
+                cam = torch.nan_to_num(cam, nan=0.0, posinf=1., neginf=0.0)
+                # cl_logits: 1, nc.
+                return cam, cl_logits
 
             if self.args.amp_eval:
                 output = output.float()

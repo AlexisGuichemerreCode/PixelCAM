@@ -487,6 +487,9 @@ def get_args(args: dict, eval: bool = False):
     parser.add_argument('--sat_area_th', type=float, default=None,
                         help='SAT. area threshold..')
 
+    #Energy CAM
+    parser.add_argument('--pixel_wise_classification', type=str2bool, default=None,
+                        help='parameter to control the creation of the second head for localization for Energy Model')
     # Domain adaptation
     parser.add_argument('--sf_uda', type=str2bool, default=None,
                         help='If ture, we set the source free unsupervised '

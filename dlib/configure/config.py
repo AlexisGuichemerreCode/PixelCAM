@@ -373,6 +373,9 @@ def get_config(ds: str, fold: int, magnification: str) -> dict:
         "sat_drop_rate": 0.0,  # float [0, 1] stochastic depth decay rule same value in SAT code
         "sat_drop_path_rate": 0.1,  # float [0, 1] drop path for stochastic depth same value in SAT code
         "sat_area_th": 0.35,  # float [0, 1] area threshold for SAT same value in SAT code
+
+        #Energy CAM ----------------------------------------------------------
+        "pixel_wise_classification": False,  # Add this parameter to control the creation of the second head for localization for Energy Model
         # ======================================================================
         #                          Segmentation mode
         # ======================================================================
