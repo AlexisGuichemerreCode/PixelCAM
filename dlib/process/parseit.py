@@ -490,6 +490,16 @@ def get_args(args: dict, eval: bool = False):
     #Energy CAM
     parser.add_argument('--pixel_wise_classification', type=str2bool, default=None,
                         help='parameter to control the creation of the second head for localization for Energy Model')
+    parser.add_argument('--path_cam', type=str, default=None)
+
+    parser.add_argument('--ece', type=str2bool, default=None)
+    parser.add_argument('--ece_lambda', type=float, default=None, 
+                        help='ECE: lambda value for loss .')
+    
+    parser.add_argument('--eng_marginal', type=str2bool, default=None)
+    parser.add_argument('--eng_lambda', type=float, default=None, 
+                        help='ENG: lambda value for loss .')
+
     # Domain adaptation
     parser.add_argument('--sf_uda', type=str2bool, default=None,
                         help='If ture, we set the source free unsupervised '
@@ -944,6 +954,8 @@ def get_args(args: dict, eval: bool = False):
         assert os.path.isdir(args['sf_uda_source_folder']), args[
             'sf_uda_source_folder']
 
+    if args['task'] in [constants.STD_CL] and args['path_cam'] is not None:
+        args['std_cams_folder']['train'] = args['path_cam']
 
     if args['task'] in [constants.F_CL, constants.NEGEV]:
         for split in constants.SPLITS:

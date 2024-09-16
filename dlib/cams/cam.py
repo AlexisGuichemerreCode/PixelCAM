@@ -509,7 +509,7 @@ if __name__ == "__main__":
                         Verbosity.VERBOSE,
                         join(outd, "log-cam-{}.txt".format(exp_id))),
                     ArbStdOutBackend(Verbosity.VERBOSE)]
-    DLLogger.init_arb(backends=log_backends)
+    DLLogger.init_arb(backends=log_backends,master_pid=0)
 
     model_names = {resnet50: 'resnet50',
                    vgg16: 'vgg16',
@@ -595,6 +595,7 @@ if __name__ == "__main__":
         model = create_model(
             task=constants.STD_CL,
             arch=constants.STDCLASSIFIER,
+            method=constants.METHOD_CAM,
             encoder_name=encoder_name,
             encoder_weights=constants.IMAGENET,
             in_channels=3,

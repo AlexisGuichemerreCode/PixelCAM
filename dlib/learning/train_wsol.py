@@ -207,7 +207,7 @@ class Trainer(Basic):
         )
 
         self.sl_mask_builder = None
-        if args.task in [constants.F_CL, constants.NEGEV]:
+        if args.task in [constants.F_CL, constants.NEGEV] or args.pixel_wise_classification:
             self.sl_mask_builder = self._get_sl(args)
 
         self.epoch = 0
@@ -389,7 +389,7 @@ class Trainer(Basic):
         return build_std_cam_extractor(classifier=classifier, args=args)
 
     def _get_sl(self, args):
-        if args.task == constants.F_CL:
+        if args.task == constants.F_CL or self.args.pixel_wise_classification:
             return selflearning.MBSeederSLFCAMS(
                     min_=args.sl_min,
                     max_=args.sl_max,
@@ -613,15 +613,25 @@ class Trainer(Basic):
             output = self.model(images)
 
             if args.task == constants.STD_CL:
+                if args.pixel_wise_classification:
+                    if std_cams is None:
+                        cams_inter = self.get_std_cams_minibatch(images=images,
+                                                                targets=z_label)
+                    else:
+                        cams_inter = std_cams
+
+                    with torch.no_grad():
+                        seeds = self.sl_mask_builder(cams_inter)
+
                 cl_logits = output
-                loss_params = {'sat_aux_losses': self.model.losses_dict, "sat_area_th": self.args.sat_area_th} if self.args.method == constants.METHOD_SAT else {}
+            
                 loss = self.loss(epoch=self.epoch,
                                  model=self.model,
                                  cl_logits=cl_logits,
                                  glabel=y_global,
                                  pseudo_glabel=y_pl_global,
                                  cutmix_holder=cutmix_holder,
-                                 **loss_params
+                                 seeds=seeds
                                  )
                 logits = cl_logits
 
@@ -1116,6 +1126,7 @@ class Trainer(Basic):
             targets = targets.cuda(self.args.c_cudaid)
             with torch.no_grad():
                 cl_logits = self.cl_forward(images)
+
                 pred = cl_logits.argmax(dim=1)
 
             num_correct += (pred == targets).sum().detach()

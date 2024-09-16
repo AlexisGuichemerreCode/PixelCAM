@@ -14,6 +14,7 @@ sys.path.append(root_dir)
 
 from dlib.losses.elb import ELB
 from dlib.losses.entropy import Entropy
+from dlib.losses.energy_marginal import Energy_Marginal
 from dlib import crf
 
 from dlib.div_classifiers.parts.spg import get_loss as get_spg_loss
@@ -40,7 +41,9 @@ __all__ = [
     'ConRanFieldNegev',
     'JointConRanFieldNegev',
     'MaxSizePositiveNegev',
-    'NegativeSamplesNegev'
+    'NegativeSamplesNegev',
+    'EnergyCEloss',
+    'Energy_Marginal'
 ]
 
 
@@ -1073,5 +1076,171 @@ class SatLoss(ElementaryLoss):
             
         loss = loss_cls +  torch.abs(ba_loss - sat_area_th) + norm_loss 
         
+        # loss =  loss_cls +  torch.abs(sat_aux_losses['ba_loss'] - sat_area_th).mean(0) + sat_aux_losses['norm_loss']
+        return loss
+
+class EnergyCEloss(ElementaryLoss):
+    def __init__(self, **kwargs):
+        super(EnergyCEloss, self).__init__(**kwargs)
+
+        self.ece_lambda = 0.0
+        self._is_already_set = False
+        self.loss = nn.CrossEntropyLoss(reduction="mean").to(self._device)
+
+    def set_it(self, ece_lambda):
+
+        self.ece_lambda = ece_lambda
+        self._is_already_set = True
+
+    def forward(self,
+                epoch=0,
+                model=None,
+                cams_inter=None,
+                fcams=None,
+                cl_logits=None,
+                glabel=None,
+                raw_img=None,
+                x_in=None,
+                im_recon=None,
+                seeds=None,
+                sat_aux_losses = None,
+                sat_area_th = None,
+                pseudo_glabel = None,
+                cutmix_holder = None,
+                ):
+        super(EnergyCEloss, self).forward(epoch=epoch)
+
+        if not self.is_on():
+            return self._zero
+        
+        #Position of foreground and background from pre-trained CAM
+        indices_1 = (seeds == 1).nonzero(as_tuple=False)
+        indices_0 = (seeds == 1).nonzero(as_tuple=False)
+
+        retrieved_values_1 = []
+
+        for idx in indices_1:
+            batch_idx, x, y = idx
+            values = model.cams[batch_idx, :, x, y]
+            retrieved_values_1.append(values)
+        
+        retrieved_values_1 = torch.stack(retrieved_values_1)
+        labels_1 = torch.ones(len(retrieved_values_1), dtype=torch.long)
+
+        retrieved_values_0 = []
+
+        for idx in indices_0:
+            batch_idx, x, y = idx
+            values = model.cams[batch_idx, :, x, y]
+            retrieved_values_0.append(values)
+        
+        retrieved_values_0 = torch.stack(retrieved_values_0)
+        labels_0 = torch.ones(len(retrieved_values_0), dtype=torch.long)
+
+        combined_values = torch.cat((retrieved_values_1, retrieved_values_0), dim=0).to(self._device)
+        combined_labels = torch.cat((labels_1, labels_0), dim=0).to(self._device)
+
+        loss = self.loss(combined_values, combined_labels) * self.ece_lambda
+
+        
+        # loss =  loss_cls +  torch.abs(sat_aux_losses['ba_loss'] - sat_area_th).mean(0) + sat_aux_losses['norm_loss']
+        return loss
+    
+class EnergyMGloss(ElementaryLoss):
+    def __init__(self, **kwargs):
+        super(EnergyMGloss, self).__init__(**kwargs)
+
+        self.eng_lambda = 0.0
+        self._is_already_set = False
+        self.loss = Energy_Marginal()
+
+    def set_it(self, eng_lambda,sgld_lr =1.0, sgld_std=0.01):
+
+        self.eng_lambda = eng_lambda
+        self.sgld_lr = sgld_lr
+        self.sgld_std = sgld_std
+        self._is_already_set = True
+
+    def forward(self,
+                epoch=0,
+                model=None,
+                cams_inter=None,
+                fcams=None,
+                cl_logits=None,
+                glabel=None,
+                raw_img=None,
+                x_in=None,
+                im_recon=None,
+                seeds=None,
+                sat_aux_losses = None,
+                sat_area_th = None,
+                pseudo_glabel = None,
+                cutmix_holder = None,
+                ):
+        super(EnergyMGloss, self).forward(epoch=epoch)
+
+        if not self.is_on():
+            return self._zero
+        
+        #Position of foreground and background from pre-trained CAM
+        indices_1 = (seeds == 1).nonzero(as_tuple=False)
+        indices_0 = (seeds == 1).nonzero(as_tuple=False)
+
+        retrieved_values_1 = []
+
+        for idx in indices_1:
+            batch_idx, x, y = idx
+            values = model.cams[batch_idx, :, x, y]
+            retrieved_values_1.append(values)
+        
+        retrieved_values_1 = torch.stack(retrieved_values_1)
+
+        retrieved_values_0 = []
+
+        for idx in indices_0:
+            batch_idx, x, y = idx
+            values = model.cams[batch_idx, :, x, y]
+            retrieved_values_0.append(values)
+        
+        retrieved_values_0 = torch.stack(retrieved_values_0)
+
+
+        combined_values = torch.cat((retrieved_values_1, retrieved_values_0), dim=0).to(self._device)
+
+        first_dimension = combined_values.shape[0]
+
+        model.eval()
+        n_steps = 20 
+
+        y = None
+        uniform_tensor = torch.FloatTensor(32, 2048, 1, 1).uniform_(-1, 1).half()
+
+        x_k = torch.autograd.Variable(uniform_tensor, requires_grad=True).to(self._device)
+
+        for k in range(n_steps):
+            f_prime = torch.autograd.grad(model.pixel_wise_classification_head(x_k).sum(), [x_k], retain_graph=True)[0]
+            x_k.data += self.sgld_lr * f_prime + self.sgld_std * torch.randn_like(x_k)
+
+        #loss = self.loss(combined_values, combined_labels) * self.ece_lambda
+
+        model.train()
+        final_samples = x_k.detach()
+
+        batch_size = 32
+        channels = combined_values.size(1)
+        #height = combined_values.size(2)
+        #width = combined_values.size(3)
+        
+        random_indices_h = torch.randint(0, 224, (batch_size,))
+        random_indices_w = torch.randint(0, 224, (batch_size,))
+
+        output_tensor = model.cams[torch.arange(batch_size), :, random_indices_h, random_indices_w]
+
+        output_tensor = output_tensor.squeeze(-1).squeeze(-1)
+        energy_target = output_tensor.sum(dim=1)
+
+        energy_sample = model.pixel_wise_classification_head(final_samples).sum(dim=1).squeeze()
+
+        loss = self.loss(energy_target, energy_sample) * self.eng_lambda
         # loss =  loss_cls +  torch.abs(sat_aux_losses['ba_loss'] - sat_area_th).mean(0) + sat_aux_losses['norm_loss']
         return loss

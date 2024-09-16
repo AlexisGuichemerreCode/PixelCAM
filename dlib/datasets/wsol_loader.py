@@ -248,7 +248,7 @@ class WSOLImageLabelDataset(Dataset):
             image, raw_img, std_cam, mask)
 
         raw_img = np.array(raw_img, dtype=np.float32)  # h, w, 3
-        raw_img = dlibf.to_tensor(raw_img).permute(2, 0, 1)  # 3, h, w.
+        raw_img = dlibf.to_tensor(raw_img).permute(2, 0, 1)  # 3, h, wf.
         mask = mask.long() if mask is not None else mask  # 1, h, w. val: {0, 1}
 
         std_cam = 0 if std_cam is None else std_cam

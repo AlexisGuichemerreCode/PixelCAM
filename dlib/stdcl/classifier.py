@@ -2,6 +2,8 @@ import copy
 import sys
 from os.path import dirname, abspath
 from typing import Optional, Union, List
+import torch.nn.functional as F
+
 
 import torch
 from torch.cuda.amp import autocast
@@ -40,6 +42,7 @@ class STDClassifier(STDClModel):
         self.task = constants.STD_CL
         assert scale_in > 0.
         self.scale_in = float(scale_in)
+        self.pixel_wise_classification=pixel_wise_classification
 
         assert isinstance(spatial_dropout, float), spatial_dropout
         assert 0. <= spatial_dropout <= 1., spatial_dropout
@@ -67,7 +70,7 @@ class STDClassifier(STDClModel):
         )
 
         # If pixel_wise_classification is True, create the second head
-        if pixel_wise_classification:
+        if self.pixel_wise_classification:
             self.pixel_wise_classification_head = poolings.__dict__['PixelWise'](
                 in_channels=self.encoder.out_channels[-1], **aux_params
             )

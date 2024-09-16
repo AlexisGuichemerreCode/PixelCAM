@@ -32,6 +32,9 @@ from dlib.losses.core import JointConRanFieldNegev
 from dlib.losses.core import MaxSizePositiveNegev
 from dlib.losses.core import NegativeSamplesNegev
 
+from dlib.losses.core import EnergyCEloss
+from dlib.losses.core import EnergyMGloss
+
 from dlib.losses.sf_uda import UdaCrossEntropyImgPseudoLabels
 from dlib.losses.sf_uda import UdaTargetClassProbEntropy
 from dlib.losses.sf_uda import UdaDiversityTargetClass

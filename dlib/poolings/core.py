@@ -300,17 +300,37 @@ class PixelWise(_BasicPooler):
         if self.support_background:
             classes = classes + 1
 
-        self.conv = nn.Conv2d(self.in_channels, out_channels=classes,
-                              kernel_size=1)
+        #self.conv = nn.Conv2d(self.in_channels, out_channels=classes,
+        #                      kernel_size=1)
+
+        self.conv1 = nn.Conv2d(self.in_channels, 1024, kernel_size=1)
+        self.bn1 = nn.BatchNorm2d(1024)
+        self.relu1 = nn.ReLU()
+
+        self.conv2 = nn.Conv2d(1024, 512, kernel_size=1)
+        self.bn2 = nn.BatchNorm2d(512)
+        self.relu2 = nn.ReLU()
+
+        self.conv3 = nn.Conv2d(512, 256, kernel_size=1)
+        self.bn3 = nn.BatchNorm2d(256)
+        self.relu3 = nn.ReLU()
+
+        self.conv4 = nn.Conv2d(256, classes, kernel_size=1)
+
 
     def freeze_cl_hypothesis(self):
         # SFUDA: freeze the last linear weights + bias of the classifier
         self.freeze_part(self.conv)  
         
-    def forward(self, x: torch.Tensor, return_cams:bool=False) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, return_cams:bool=True) -> torch.Tensor:
         self.assert_x(x)
 
-        logits = self.conv(x)
+        x = self.relu1(self.bn1(self.conv1(x)))
+        x = self.relu2(self.bn2(self.conv2(x)))
+        x = self.relu3(self.bn3(self.conv3(x)))
+        logits = self.conv4(x)
+
+        #logits = self.conv(x)
         if return_cams:
             self.cams = logits
         return logits

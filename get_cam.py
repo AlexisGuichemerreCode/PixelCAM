@@ -325,6 +325,7 @@ def get_cam(exp_path, checkpoint_type, dataset, cudaid, split='train', tmp_outd=
         args_dict = yaml.load(fy, Loader=IgnoreKeyLoader)
         # args_dict = yaml.safe_load(fy)
         args_dict['model']['freeze_encoder'] = False
+        args_dict['pixel_wise_classification'] = False
         args = Dict2Obj(args_dict)
         args.outd = tmp_outd
         args.distributed = False
@@ -364,6 +365,7 @@ def get_cam(exp_path, checkpoint_type, dataset, cudaid, split='train', tmp_outd=
         args_dict = yaml.load(fy, Loader=IgnoreKeyLoader)
         # args_dict = yaml.safe_load(fy)
         # args_dict['model']['freeze_encoder'] = False
+        args_dict['pixel_wise_classification'] = False
         args = Dict2Obj(args_dict)
         args.outd = tmp_outd
         args.distributed = False
@@ -487,12 +489,15 @@ def get_cam(exp_path, checkpoint_type, dataset, cudaid, split='train', tmp_outd=
                 
                 cam.detach()
 
-                cam_np = cam.cpu().numpy()
-                cam_np = ((cam_np - cam_np.min()) * (1/(cam_np.max() - cam_np.min()) * 255)).astype('uint8')
-                cam_img = Image.fromarray(cam_np)
+                # cam_np = cam.cpu().numpy()
+                # cam_np = ((cam_np - cam_np.min()) * (1/(cam_np.max() - cam_np.min()) * 255)).astype('uint8')
+                # cam_img = Image.fromarray(cam_np)
 
                 image_idx = os.path.basename(image_id)
-                cam_img.save(os.path.join(path_cam, f'{image_idx}'))
+                file_wo_bmp = os.path.splitext(image_idx)[0]
+                file_pt = f'{file_wo_bmp}.pt'
+                output_path = path_cam + '_' + file_pt
+                torch.save(cam, output_path)
 
 
     return overlay_images, input_images, method_name, gt_masks
@@ -505,6 +510,8 @@ def fast_eval():
     parser.add_argument("--split", type=str, default=None)
     parser.add_argument("--checkpoint_type", type=str, default=None)
     parser.add_argument("--encoder_name", type=str, default=None)
+    parser.add_argument("--pixel_wise_classification", type=str2bool, default=False)
+    
     # parser.add_argument("--exp_path", type=str, default=None)
     parser.add_argument("--tmp_outd", type=str, default='tmp_outd')
     parser.add_argument('--noise_level_for_eval_with_noisy_bbox', nargs='+',

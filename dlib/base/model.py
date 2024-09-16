@@ -30,10 +30,18 @@ class STDClModel(torch.nn.Module):
 
         self.x_in = x
         features = self.encoder(x)
+
         cl_logits = self.classification_head(self.dropout_2d(features[-1]))
         self.encoder_last_features = features[-1]
 
-        return cl_logits
+        if self.pixel_wise_classification:
+            loc_logits = self.pixel_wise_classification_head(features[-1])
+            _, _, target_height, target_width = x.shape
+            resized_logits = F.interpolate(loc_logits, size=(target_height, target_width), mode='bilinear', align_corners=False)
+            self.cams =  resized_logits
+            return cl_logits
+        else:
+            return cl_logits
 
     def __str__(self):
         return "{}. Task: {}.".format(self.name, self.task)
@@ -47,6 +55,12 @@ class STDClModel(torch.nn.Module):
             info += '\tClassification head [{}]: {}. \n'.format(
                 self.classification_head.name,
                 count_params(self.classification_head))
+
+        if self.pixel_wise_classification:
+            info += '\tPixel Wise Classification head [{}]: {}. \n'.format(
+                self.pixel_wise_classification_head.name,
+                count_params(self.pixel_wise_classification_head))
+            
         info += '\tTotal: {}. \n'.format(count_params(self))
 
         return info

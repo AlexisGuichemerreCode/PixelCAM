@@ -720,6 +720,24 @@ def get_loss_source(args):
         assert len(masterloss.n_holder) > 1
     else:
         raise NotImplementedError
+    
+    #Pixel classification
+    if args.task == constants.STD_CL and args.pixel_wise_classification:
+        if args.ece:
+            EnergyCE_loss = losses.EnergyCEloss(
+                    cuda_id=args.c_cudaid,
+                    support_background=support_background,
+                    multi_label_flag=multi_label_flag)
+            EnergyCE_loss.set_it(ece_lambda=args.ece_lambda)
+            masterloss.add(EnergyCE_loss)
+
+        if args.eng_marginal:
+            EnergyMarginal_loss = losses.EnergyMGloss(
+                    cuda_id=args.c_cudaid,
+                    support_background=support_background,
+                    multi_label_flag=multi_label_flag)
+            EnergyMarginal_loss.set_it(eng_lambda=args.eng_lambda)
+            masterloss.add(EnergyMarginal_loss)
 
     masterloss.check_losses_status()
     masterloss.cuda(args.c_cudaid)

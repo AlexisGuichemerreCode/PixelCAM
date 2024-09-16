@@ -1,10 +1,10 @@
-DLLL 2024-07-31 18:05:48.982829 0:00:00.161577 
-===================================================================================================
- TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: CAMELYON512 	 METHOD: GRADCAMPP 	 ENCODER: RESNET50 	
-===================================================================================================
+DLLL 2024-08-10 19:59:23.036453 0:00:00.140564 
+============================================================================================
+ TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: GLAS 	 METHOD: GRADCAMPP 	 ENCODER: RESNET50 	
+============================================================================================
 
-DLLL 2024-07-31 18:05:49.780742 0:00:00.959490 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 23514179
-DLLL 2024-07-31 18:05:49.780902 0:00:00.959650 Arch: STDClassifier
+DLLL 2024-08-10 19:59:24.139812 0:00:01.243923 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 23514179
+DLLL 2024-08-10 19:59:24.140322 0:00:01.244433 Arch: STDClassifier
 task: STD_CL
 encoder_name: resnet50
 encoder_weights: imagenet
@@ -27,14 +27,14 @@ freeze_cl: False
 im_rec: False
 img_range: tanh 
 
-DLLL 2024-07-31 18:05:49.786738 0:00:00.965486 u-resnet50. Task: STD_CL. 
+DLLL 2024-08-10 19:59:24.146730 0:00:01.250841 u-resnet50. Task: STD_CL. 
  NBR-PARAMS: 
 	Encoder [resnet50]: 23508032. 
 	Classification head [WGAP]: 6147. 
 	Total: 23514179. 
 
-DLLL 2024-07-31 18:05:49.887438 0:00:01.066186 
+DLLL 2024-08-10 19:59:24.254283 0:00:01.358394 
 ========================================================================================================================
- MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/HISTOLOGY_PROJECT/MODEL_BENCHMARK_SFUDA/SOURCE_MODELS/BLOC/CAMELYON512/ID_SOURCE_13_CAMELYON512_GRADCAMPP_2-TSK_STD_CL-DS_CAMELYON512-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_GRADCAMPP-SPOOLING_WGAP-ARCH_STDCLASSIFIER-ECD_RESNET50/CAMELYON512-0-RESNET50-GRADCAMPP-WGAP-CP_BEST_LOCALIZATION
+ MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/HISTOLOGY_PROJECT/MODEL_BENCHMARK_SFUDA/SOURCE_MODELS/BLOC/GLAS/ID_SOURCE_10_GLAS_GRADCAMPP_350-TSK_STD_CL-DS_GLAS-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_GRADCAMPP-SPOOLING_WGAP-ARCH_STDCLASSIFIER-ECD_RESNET50/GLAS-0-RESNET50-GRADCAMPP-WGAP-CP_BEST_LOCALIZATION
 ========================================================================================================================
 

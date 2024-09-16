@@ -541,7 +541,7 @@ class EnergyCAM:
 
     def __init__(
         self,
-        model: Union[UnetFCAM, UnetNEGEV, Unet]
+        model: Union[STDClassifier, UnetFCAM, UnetNEGEV, Unet]
     ) -> None:
 
         self.assert_model(model)
@@ -573,7 +573,6 @@ class EnergyCAM:
         return cams
 
     def __call__(self,
-                 image: Tensor,
                  class_idx: Optional[int] = None,
                  scores: Optional[Tensor] = None,
                  normalized: bool = True,
@@ -581,7 +580,7 @@ class EnergyCAM:
                  argmax: bool = False) -> Tensor:
 
         # Compute CAM: (h, w)
-        cam = self.compute_cams(image, argmax=argmax)
+        cam = self.compute_cams(argmax=argmax)
         if reshape is not None:
             assert len(reshape) == 2
             cam = F.interpolate(cam.unsqueeze(0).unsqueeze(0),
@@ -614,6 +613,7 @@ class EnergyCAM:
             cam = torch.argmax(cams, dim=1).squeeze(0).float()  # (h, w)
         else:
             cam = torch.softmax(cams, dim=1)[:, 1, :, :].squeeze(0)  # (h, w)
+
 
         return cam
 

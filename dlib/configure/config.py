@@ -376,6 +376,13 @@ def get_config(ds: str, fold: int, magnification: str) -> dict:
 
         #Energy CAM ----------------------------------------------------------
         "pixel_wise_classification": False,  # Add this parameter to control the creation of the second head for localization for Energy Model
+        "path_cam": None,  # path_cam for CAM for Energy Model
+
+        "ece": False,  # use or not ECE.
+        "ece_lambda": 1.,  # lambda for ECE.
+
+        "eng_marginal": False,  # use or not marginal energy.
+        "eng_lambda": 1.,  # lambda for marginal energy.
         # ======================================================================
         #                          Segmentation mode
         # ======================================================================
