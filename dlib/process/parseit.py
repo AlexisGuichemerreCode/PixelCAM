@@ -1146,7 +1146,7 @@ def get_args(args: dict, eval: bool = False):
                               args.max_sizepos_ng,
                               args.neg_samples_ng]
 
-    if args.task == constants.STD_CL:
+    if args.task == constants.STD_CL and args.method != constants.METHOD_ENERGY:
         assert not any(used_constraints_f_cl)
         assert not any(used_constraints_negev)
 

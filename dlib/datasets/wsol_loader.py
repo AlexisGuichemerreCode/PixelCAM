@@ -254,6 +254,7 @@ class WSOLImageLabelDataset(Dataset):
         std_cam = 0 if std_cam is None else std_cam
         mask = 0 if mask is None else mask
 
+
         # SFUDA, FAUST views
         views = 0
         if self.sfuda_faust and (self.sfuda_n_rnd_views >= 1):
@@ -506,7 +507,7 @@ class Resize(_BasicTransform):
     def __call__(self, img, raw_img, std_cam, mask):
         std_cam_ = std_cam
         if std_cam_ is not None:
-            std_cam_ = TF.resize(std_cam_, self.size, self.interpolation)
+            std_cam_ = TF.resize(std_cam_, self.size, self.interpolation, antialias = True)
 
         mask_ = mask
         if mask_ is not None:

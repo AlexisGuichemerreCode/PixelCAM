@@ -204,7 +204,7 @@ class CAMComputer(object):
             if self.args.pixel_wise_classification:
                 cl_logits = output
                 cam = self.std_cam_extractor(
-                                        class_idx=target,
+                                         class_idx=target,
                                          normalized=True,
                                          reshape=img_shape if self.special1
                                          else None)

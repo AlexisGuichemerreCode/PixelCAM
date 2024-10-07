@@ -303,19 +303,36 @@ class PixelWise(_BasicPooler):
         #self.conv = nn.Conv2d(self.in_channels, out_channels=classes,
         #                      kernel_size=1)
 
-        self.conv1 = nn.Conv2d(self.in_channels, 1024, kernel_size=1)
-        self.bn1 = nn.BatchNorm2d(1024)
-        self.relu1 = nn.ReLU()
+        # self.conv1 = nn.Conv2d(self.in_channels, 1024, kernel_size=1)
+        # self.bn1 = nn.BatchNorm2d(1024)
+        # self.relu1 = nn.ReLU()
 
-        self.conv2 = nn.Conv2d(1024, 512, kernel_size=1)
-        self.bn2 = nn.BatchNorm2d(512)
-        self.relu2 = nn.ReLU()
+        # self.conv2 = nn.Conv2d(1024, 512, kernel_size=1)
+        # self.bn2 = nn.BatchNorm2d(512)
+        # self.relu2 = nn.ReLU()
 
-        self.conv3 = nn.Conv2d(512, 256, kernel_size=1)
-        self.bn3 = nn.BatchNorm2d(256)
-        self.relu3 = nn.ReLU()
+        # self.conv3 = nn.Conv2d(512, 256, kernel_size=1)
+        # self.bn3 = nn.BatchNorm2d(256)
+        # self.relu3 = nn.ReLU()
 
-        self.conv4 = nn.Conv2d(256, classes, kernel_size=1)
+        # self.conv4 = nn.Conv2d(256, classes, kernel_size=1)
+
+
+        mid_features1 = self.in_channels // 2
+        mid_features2 = mid_features1 // 2
+        mid_features3 = mid_features2 // 2
+        
+        self.layer1 = self._make_layer(self.in_channels, mid_features1)
+        self.layer2 = self._make_layer(mid_features1, mid_features2)
+        self.layer3 = self._make_layer(mid_features2, mid_features3)
+        self.conv4 = nn.Conv2d(mid_features3, classes, kernel_size=1)
+
+    def _make_layer(self, in_channels, out_channels):
+        return nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size=1),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU()
+        )
 
 
     def freeze_cl_hypothesis(self):
@@ -325,11 +342,14 @@ class PixelWise(_BasicPooler):
     def forward(self, x: torch.Tensor, return_cams:bool=True) -> torch.Tensor:
         self.assert_x(x)
 
-        x = self.relu1(self.bn1(self.conv1(x)))
-        x = self.relu2(self.bn2(self.conv2(x)))
-        x = self.relu3(self.bn3(self.conv3(x)))
+        #out1 = self.relu1(self.bn1(self.conv1(x)))
+        #out2 = self.relu2(self.bn2(self.conv2(out1)))
+        #out3 = self.relu3(self.bn3(self.conv3(out2)))
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
         logits = self.conv4(x)
-
+        
         #logits = self.conv(x)
         if return_cams:
             self.cams = logits

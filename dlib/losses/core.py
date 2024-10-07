@@ -1085,7 +1085,7 @@ class EnergyCEloss(ElementaryLoss):
 
         self.ece_lambda = 0.0
         self._is_already_set = False
-        self.loss = nn.CrossEntropyLoss(reduction="mean").to(self._device)
+        self.loss = nn.CrossEntropyLoss(reduction="mean", ignore_index=-255).to(self._device)
 
     def set_it(self, ece_lambda):
 
@@ -1113,38 +1113,82 @@ class EnergyCEloss(ElementaryLoss):
         if not self.is_on():
             return self._zero
         
-        #Position of foreground and background from pre-trained CAM
-        indices_1 = (seeds == 1).nonzero(as_tuple=False)
-        indices_0 = (seeds == 1).nonzero(as_tuple=False)
+        # #Position of foreground and background from pre-trained CAM
+        # indices_1 = (seeds == 1).nonzero(as_tuple=False)
+        # indices_0 = (seeds == 0).nonzero(as_tuple=False)
 
-        retrieved_values_1 = []
+        # retrieved_values_1 = []
 
-        for idx in indices_1:
-            batch_idx, x, y = idx
-            values = model.cams[batch_idx, :, x, y]
-            retrieved_values_1.append(values)
+        # for idx in indices_1:
+        #     batch_idx, x, y = idx
+        #     values = model.cams[batch_idx, :, x, y]
+        #     retrieved_values_1.append(values)
         
-        retrieved_values_1 = torch.stack(retrieved_values_1)
-        labels_1 = torch.ones(len(retrieved_values_1), dtype=torch.long)
+        # retrieved_values_1 = torch.stack(retrieved_values_1)
+        # labels_1 = torch.ones(len(retrieved_values_1), dtype=torch.long)
 
-        retrieved_values_0 = []
+        # retrieved_values_0 = []
 
-        for idx in indices_0:
-            batch_idx, x, y = idx
-            values = model.cams[batch_idx, :, x, y]
-            retrieved_values_0.append(values)
+        # for idx in indices_0:
+        #     batch_idx, x, y = idx
+        #     values = model.cams[batch_idx, :, x, y]
+        #     retrieved_values_0.append(values)
         
-        retrieved_values_0 = torch.stack(retrieved_values_0)
-        labels_0 = torch.ones(len(retrieved_values_0), dtype=torch.long)
+        # retrieved_values_0 = torch.stack(retrieved_values_0)
+        # labels_0 = torch.zeros(len(retrieved_values_0), dtype=torch.long)
 
-        combined_values = torch.cat((retrieved_values_1, retrieved_values_0), dim=0).to(self._device)
-        combined_labels = torch.cat((labels_1, labels_0), dim=0).to(self._device)
+        # combined_values = torch.cat((retrieved_values_1, retrieved_values_0), dim=0).to(self._device)
+        # combined_labels = torch.cat((labels_1, labels_0), dim=0).to(self._device)
 
-        loss = self.loss(combined_values, combined_labels) * self.ece_lambda
+        # loss = self.loss(combined_values, combined_labels) * self.ece_lambda
 
-        
-        # loss =  loss_cls +  torch.abs(sat_aux_losses['ba_loss'] - sat_area_th).mean(0) + sat_aux_losses['norm_loss']
+        loss = self.loss(model.cams,seeds)  * self.ece_lambda
+
+
         return loss
+    
+
+class ConRanFieldPxcams(ElementaryLoss):
+    def __init__(self, **kwargs):
+        super(ConRanFieldPxcams, self).__init__(**kwargs)
+
+        self.loss = crf.DenseCRFLoss(
+            weight=self.lambda_, sigma_rgb=self.sigma_rgb,
+            sigma_xy=self.sigma_xy, scale_factor=self.scale_factor
+        ).to(self._device)
+
+    def forward(self,
+                epoch=0,
+                model=None,
+                cams_inter=None,
+                fcams=None,
+                cl_logits=None,
+                seg_logits=None,
+                glabel=None,
+                pseudo_glabel=None,
+                masks=None,
+                raw_img=None,
+                x_in=None,
+                im_recon=None,
+                seeds=None,
+                cutmix_holder=None,
+                key_arg: dict = None
+                ):
+        super(ConRanFieldPxcams, self).forward(epoch=epoch)
+
+        if not self.is_on():
+            return self._zero
+        
+        fcams = model.cams
+        if fcams.shape[1] > 1:
+            fcams_n = F.softmax(fcams, dim=1)
+        else:
+            fcams_n = F.sigmoid(fcams)
+            fcams_n = torch.cat((1. - fcams_n, fcams_n), dim=1)
+
+        return self.loss(images=raw_img, segmentations=fcams_n)
+    
+
     
 class EnergyMGloss(ElementaryLoss):
     def __init__(self, **kwargs):

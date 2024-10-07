@@ -402,3 +402,11 @@ class UnetNEGEVDecoder(nn.Module):
             x = decoder_block(x, skip)
 
         return x
+    
+    def load_state_dict(self, state_dict, **kwargs):
+        state_dict.pop("fc.bias", None)
+        state_dict.pop("fc.weight", None)
+        super().load_state_dict(state_dict, **kwargs)
+
+    def super_load_state_dict(self, state_dict, **kwargs):
+        super().load_state_dict(state_dict, **kwargs)

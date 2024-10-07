@@ -389,7 +389,19 @@ class Trainer(Basic):
         return build_std_cam_extractor(classifier=classifier, args=args)
 
     def _get_sl(self, args):
-        if args.task == constants.F_CL or self.args.pixel_wise_classification:
+        if args.task == constants.F_CL:
+            return selflearning.MBSeederSLFCAMS(
+                    min_=args.sl_min,
+                    max_=args.sl_max,
+                    ksz=args.sl_ksz,
+                    min_p=args.sl_min_p,
+                    fg_erode_k=args.sl_fg_erode_k,
+                    fg_erode_iter=args.sl_fg_erode_iter,
+                    support_background=args.model['support_background'],
+                    multi_label_flag=args.multi_label_flag,
+                    seg_ignore_idx=args.seg_ignore_idx)
+        
+        elif self.args.pixel_wise_classification:
             return selflearning.MBSeederSLFCAMS(
                     min_=args.sl_min,
                     max_=args.sl_max,
@@ -630,6 +642,7 @@ class Trainer(Basic):
                                  cl_logits=cl_logits,
                                  glabel=y_global,
                                  pseudo_glabel=y_pl_global,
+                                 raw_img=raw_imgs,
                                  cutmix_holder=cutmix_holder,
                                  seeds=seeds
                                  )
@@ -1484,6 +1497,13 @@ class Trainer(Basic):
                     torch.save(_model.mask_head.state_dict(),
                                join(path, 'mask_head.pt'))
 
+            elif self.args.method == constants.METHOD_ENERGY:
+                torch.save(_model.encoder.state_dict(),
+                           join(path, 'encoder.pt'))
+                torch.save(_model.classification_head.state_dict(),
+                           join(path, 'classification_head.pt')),
+                torch.save(_model.pixel_wise_classification_head.state_dict(),
+                            join(path, 'pixel_wise_classification_head.pt'))
             else:
                 torch.save(_model.encoder.state_dict(),
                            join(path, 'encoder.pt'))

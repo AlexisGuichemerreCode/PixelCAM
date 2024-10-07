@@ -110,9 +110,9 @@ class FCAMModel(torch.nn.Module):
         else:
             cl_logits = self.classification_head(self.dropout_2d(features[-1]))
 
-        _features[-1] = self.self.dropout_2d(features[-1])
+        features[-1] = self.dropout_2d(features[-1])
 
-        decoder_output = self.decoder(*_features)
+        decoder_output = self.decoder(*features)
         fcams = self.segmentation_head(decoder_output)
 
         if fcams.shape[2:] != x_shape[2:]:
@@ -125,7 +125,7 @@ class FCAMModel(torch.nn.Module):
 
         im_recon = None
         if self.im_rec:
-            im_recon = self.get_reconstructed_img(*_features)
+            im_recon = self.get_reconstructed_img(*features)
 
         self.cams = fcams.detach()
 

@@ -1,0 +1,164 @@
+DLLL 2024-10-05 00:51:05.733198 0:00:01.116396 
+======================================================================================
+ TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: GLAS 	 METHOD: CAM 	 ENCODER: RESNET50 	
+======================================================================================
+
+DLLL 2024-10-05 00:51:06.628015 0:00:02.011213 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 23512130
+DLLL 2024-10-05 00:51:06.628238 0:00:02.011436 Arch: STDClassifier
+task: STD_CL
+encoder_name: resnet50
+encoder_weights: imagenet
+classes: 2
+aux_params: 
+	classes: 2
+	modalities: 5
+	kmax: 0.5
+	kmin: 0.1
+	alpha: 0.6
+	dropout: 0.0
+	support_background: False
+	r: 10.0
+	mid_channels: 128
+	gated: False
+	prm_ks: 3
+	prm_st: 1
+scale_in: 1.0
+freeze_cl: False
+im_rec: False
+img_range: tanh 
+
+DLLL 2024-10-05 00:51:06.634491 0:00:02.017689 u-resnet50. Task: STD_CL. 
+ NBR-PARAMS: 
+	Encoder [resnet50]: 23508032. 
+	Classification head [WGAP]: 4098. 
+	Total: 23512130. 
+
+DLLL 2024-10-05 00:51:06.759210 0:00:02.142408 
+========================================================================================================================
+ MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/MODEL_CVPR_2025/GLAS/BLOC/ID_SOURCE_2_GLAS_CAM_250-TSK_STD_CL-DS_GLAS-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_CAM-SPOOLING_WGAP-ARCH_STDCLASSIFIER-ECD_RESNET50/GLAS-0-RESNET50-CAM-WGAP-CP_BEST_LOCALIZATION
+========================================================================================================================
+
+DLLL 2024-10-05 00:51:13.719415 0:00:09.102613 
+============================================================================================
+ TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: GLAS 	 METHOD: GRADCAMPP 	 ENCODER: RESNET50 	
+============================================================================================
+
+DLLL 2024-10-05 00:51:14.614943 0:00:09.998141 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 23514179
+DLLL 2024-10-05 00:51:14.615098 0:00:09.998296 Arch: STDClassifier
+task: STD_CL
+encoder_name: resnet50
+encoder_weights: imagenet
+classes: 2
+aux_params: 
+	classes: 2
+	modalities: 5
+	kmax: 0.5
+	kmin: 0.1
+	alpha: 0.6
+	dropout: 0.0
+	support_background: True
+	r: 10.0
+	mid_channels: 128
+	gated: False
+	prm_ks: 3
+	prm_st: 1
+scale_in: 1.0
+freeze_cl: False
+im_rec: False
+img_range: tanh 
+
+DLLL 2024-10-05 00:51:14.621116 0:00:10.004314 u-resnet50. Task: STD_CL. 
+ NBR-PARAMS: 
+	Encoder [resnet50]: 23508032. 
+	Classification head [WGAP]: 6147. 
+	Total: 23514179. 
+
+DLLL 2024-10-05 00:51:14.760641 0:00:10.143839 
+========================================================================================================================
+ MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/MODEL_CVPR_2025/GLAS/BLOC/ID_SOURCE_10_GLAS_GRADCAMPP_350-TSK_STD_CL-DS_GLAS-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_GRADCAMPP-SPOOLING_WGAP-ARCH_STDCLASSIFIER-ECD_RESNET50/GLAS-0-RESNET50-GRADCAMPP-WGAP-CP_BEST_LOCALIZATION
+========================================================================================================================
+
+DLLL 2024-10-05 00:51:18.258230 0:00:13.641428 
+===========================================================================================
+ TASK: NEGEV 	 BOX_V2_METRIC: FALSE 	DATASET: GLAS 	 METHOD: GRADCAMPP 	 ENCODER: RESNET50 	
+===========================================================================================
+
+DLLL 2024-10-05 00:51:19.220225 0:00:14.603423 `u-resnet50. Task: NEGEV. Supp.BACK: True. Freeze CL: True. IMG-RECON: False:` was created. Nbr.params: 32527397
+DLLL 2024-10-05 00:51:19.220381 0:00:14.603579 Arch: UnetNEGEV
+task: NEGEV
+encoder_name: resnet50
+encoder_weights: imagenet
+classes: 2
+aux_params: 
+	classes: 2
+	modalities: 5
+	kmax: 0.5
+	kmin: 0.1
+	alpha: 0.6
+	dropout: 0.0
+	support_background: True
+	r: 10.0
+	mid_channels: 128
+	gated: False
+	prm_ks: 3
+	prm_st: 1
+scale_in: 1.0
+freeze_cl: True
+im_rec: False
+img_range: tanh 
+
+DLLL 2024-10-05 00:51:19.228339 0:00:14.611537 u-resnet50. Task: NEGEV. Supp.BACK: True. Freeze CL: True. IMG-RECON: False: 
+ NBR-PARAMS: 
+	Encoder [resnet50]: 23508032. 
+	Classification head [WGAP]: 6147. 
+	Decoder: 9012928. 
+	Segmentation head: 6147. 
+	Total: 32527397. 
+
+DLLL 2024-10-05 00:51:19.229470 0:00:14.612668 You have asked to set the classifier's weights  from /export/livia/home/vision/Aguichemerre/Pixel-Adaptation/pretrained/GLAS-0-resnet50-GradCAMpp-WGAP-cp_best_classification .... [OK]
+DLLL 2024-10-05 00:51:19.516896 0:00:14.900094 
+========================================================================================================================
+ MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/MODEL_CVPR_2025/GLAS/BLOC/ID_SOURCE_25_GLAS_GRADCAMPP_250-TSK_NEGEV-DS_GLAS-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_GRADCAMPP-SPOOLING_WGAP-ARCH_UNETNEGEV-ECD_RESNET50/GLAS-0-UNETNEGEV-RESNET50-GRADCAMPP-WGAP-CP_BEST_LOCALIZATION
+========================================================================================================================
+
+DLLL 2024-10-05 00:51:22.875179 0:00:18.258377 
+============================================================================================
+ TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: GLAS 	 METHOD: ENERGYCAM 	 ENCODER: RESNET50 	
+============================================================================================
+
+DLLL 2024-10-05 00:51:23.898879 0:00:19.282077 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 26270532
+DLLL 2024-10-05 00:51:23.899173 0:00:19.282371 Arch: STDClassifier
+task: STD_CL
+encoder_name: resnet50
+encoder_weights: imagenet
+classes: 2
+aux_params: 
+	classes: 2
+	modalities: 5
+	kmax: 0.5
+	kmin: 0.1
+	alpha: 0.6
+	dropout: 0.0
+	support_background: False
+	r: 10.0
+	mid_channels: 128
+	gated: False
+	prm_ks: 3
+	prm_st: 1
+scale_in: 1.0
+freeze_cl: False
+im_rec: False
+img_range: tanh 
+
+DLLL 2024-10-05 00:51:23.910839 0:00:19.294037 u-resnet50. Task: STD_CL. 
+ NBR-PARAMS: 
+	Encoder [resnet50]: 23508032. 
+	Classification head [WGAP]: 4098. 
+	Pixel Wise Classification head [PixelWise]: 2758402. 
+	Total: 26270532. 
+
+DLLL 2024-10-05 00:51:24.047314 0:00:19.430512 
+========================================================================================================================
+ MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/MODEL_CVPR_2025/GLAS/BLOC/ID_ENERGY_CAM_GLAS_GRADCAMPP_LR_00001-TSK_STD_CL-DS_GLAS-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_ENERGYCAM-SPOOLING_WGAP-ARCH_STDCLASSIFIER-ECD_RESNET50/GLAS-0-RESNET50-ENERGYCAM-WGAP-CP_BEST_LOCALIZATION
+========================================================================================================================
+

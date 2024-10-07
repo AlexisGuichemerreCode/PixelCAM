@@ -731,13 +731,23 @@ def get_loss_source(args):
             EnergyCE_loss.set_it(ece_lambda=args.ece_lambda)
             masterloss.add(EnergyCE_loss)
 
-        if args.eng_marginal:
-            EnergyMarginal_loss = losses.EnergyMGloss(
-                    cuda_id=args.c_cudaid,
-                    support_background=support_background,
-                    multi_label_flag=multi_label_flag)
-            EnergyMarginal_loss.set_it(eng_lambda=args.eng_lambda)
-            masterloss.add(EnergyMarginal_loss)
+        if args.crf_fc:
+            masterloss.add(losses.ConRanFieldPxcams(
+                cuda_id=args.c_cudaid,
+                lambda_=args.crf_lambda,
+                sigma_rgb=args.crf_sigma_rgb, sigma_xy=args.crf_sigma_xy,
+                scale_factor=args.crf_scale,
+                support_background=support_background,
+                multi_label_flag=multi_label_flag,
+                start_epoch=args.crf_start_ep, end_epoch=args.crf_end_ep,
+            ))
+        # if args.eng_marginal:
+        #     EnergyMarginal_loss = losses.EnergyMGloss(
+        #             cuda_id=args.c_cudaid,
+        #             support_background=support_background,
+        #             multi_label_flag=multi_label_flag)
+        #     EnergyMarginal_loss.set_it(eng_lambda=args.eng_lambda)
+        #     masterloss.add(EnergyMarginal_loss)
 
     masterloss.check_losses_status()
     masterloss.cuda(args.c_cudaid)
