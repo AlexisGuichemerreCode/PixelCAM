@@ -8,3 +8,4 @@ dlib/crf/crfwrapper/*
 LOG.txt
 exp_final/*
 pretrained/*
+data_cams/*

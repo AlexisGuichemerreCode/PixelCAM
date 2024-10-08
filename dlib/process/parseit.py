@@ -955,7 +955,51 @@ def get_args(args: dict, eval: bool = False):
             'sf_uda_source_folder']
 
     if args['task'] in [constants.STD_CL] and args['path_cam'] is not None:
-        args['std_cams_folder']['train'] = args['path_cam']
+        for split in constants.SPLITS:
+            #args['std_cams_folder']['train'] = args['path_cam']
+            tag = args['path_cam']
+
+            tag += '_cams_{}'.format(split)
+
+            if is_cc():
+                baseurl_sc = "{}/datasets/wsol-done-right".format(
+                    os.environ["SCRATCH"])
+                scratch_path = join(baseurl_sc, '{}.tar.gz'.format(tag))
+
+                if os.path.isfile(scratch_path):
+                    slurm_dir = config.get_root_wsol_dataset()
+                    cmds = [
+                        'cp {} {} '.format(scratch_path, slurm_dir),
+                        'cd {} '.format(slurm_dir),
+                        'tar -xf {}'.format('{}.tar.gz'.format(tag))
+                    ]
+                    cmdx = " && ".join(cmds)
+                    print("Running bash-cmds: \n{}".format(
+                        cmdx.replace("&& ", "\n")))
+                    subprocess.run(cmdx, shell=True, check=True)
+
+                    assert os.path.isdir(join(slurm_dir, tag))
+                    args['std_cams_folder'][split] = join(slurm_dir, tag)
+
+            else:
+                path_cams = join(root_dir, constants.DATA_CAMS, tag)
+                cndx = not os.path.isdir(path_cams)
+                cndx &= os.path.isfile('{}.tar.gz'.format(path_cams))
+                if cndx:
+                    cmds_untar = [
+                        'cd {} '.format(join(root_dir, constants.DATA_CAMS)),
+                        'tar -xf {} '.format('{}.tar.gz'.format(tag))
+                    ]
+                    cmdx = " && ".join(cmds_untar)
+                    print("Running bash-cmds: \n{}".format(
+                        cmdx.replace("&& ", "\n")))
+                    subprocess.run(cmdx, shell=True, check=True)
+
+                cndx = os.path.isdir(path_cams)
+                cndx &= os.path.isfile('{}.tar.gz'.format(path_cams))
+                if cndx:
+                    args['std_cams_folder'][split] = path_cams
+
 
     if args['task'] in [constants.F_CL, constants.NEGEV]:
         for split in constants.SPLITS:
