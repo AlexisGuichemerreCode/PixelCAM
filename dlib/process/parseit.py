@@ -962,24 +962,25 @@ def get_args(args: dict, eval: bool = False):
             tag += '_cams_{}'.format(split)
 
             if is_cc():
-                baseurl_sc = "{}/datasets/wsol-done-right".format(
-                    os.environ["SCRATCH"])
-                scratch_path = join(baseurl_sc, '{}.tar.gz'.format(tag))
+                # baseurl_sc = "{}/datasets/wsol-done-right".format(
+                #     os.environ["SCRATCH"])
+                # scratch_path = join(baseurl_sc, '{}.tar.gz'.format(tag))
 
-                if os.path.isfile(scratch_path):
-                    slurm_dir = config.get_root_wsol_dataset()
-                    cmds = [
-                        'cp {} {} '.format(scratch_path, slurm_dir),
-                        'cd {} '.format(slurm_dir),
-                        'tar -xf {}'.format('{}.tar.gz'.format(tag))
-                    ]
-                    cmdx = " && ".join(cmds)
-                    print("Running bash-cmds: \n{}".format(
-                        cmdx.replace("&& ", "\n")))
-                    subprocess.run(cmdx, shell=True, check=True)
+                # if os.path.isfile(scratch_path):
+                #     slurm_dir = config.get_root_wsol_dataset()
+                #     cmds = [
+                #         'cp {} {} '.format(scratch_path, slurm_dir),
+                #         'cd {} '.format(slurm_dir),
+                #         'tar -xf {}'.format('{}.tar.gz'.format(tag))
+                #     ]
+                #     cmdx = " && ".join(cmds)
+                #     print("Running bash-cmds: \n{}".format(
+                #         cmdx.replace("&& ", "\n")))
+                #     subprocess.run(cmdx, shell=True, check=True)
 
-                    assert os.path.isdir(join(slurm_dir, tag))
-                    args['std_cams_folder'][split] = join(slurm_dir, tag)
+                #     assert os.path.isdir(join(slurm_dir, tag))
+                #     args['std_cams_folder'][split] = join(slurm_dir, tag)
+                args['std_cams_folder'][split] = "{}/datasets/wsol-done-right/resnet50-gradcampp-bloc-glas_cams_{}".format(os.environ["SLURM_TMPDIR"], split.lower())
 
             else:
                 path_cams = join(root_dir, constants.DATA_CAMS, tag)
