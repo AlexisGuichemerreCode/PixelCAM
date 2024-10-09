@@ -64,7 +64,55 @@ class STDClModel(torch.nn.Module):
         info += '\tTotal: {}. \n'.format(count_params(self))
 
         return info
+    
+    def freeze_classifier(self):
+        #assert self.freeze_cl
 
+        for module in (self.encoder.modules()):
+
+            for param in module.parameters():
+                param.requires_grad = False
+
+            if isinstance(module, torch.nn.BatchNorm2d):
+                module.eval()
+
+            if isinstance(module, torch.nn.Dropout):
+                module.eval()
+
+        for module in (self.classification_head.modules()):
+            for param in module.parameters():
+                param.requires_grad = False
+
+            if isinstance(module, torch.nn.BatchNorm2d):
+                module.eval()
+
+            if isinstance(module, torch.nn.Dropout):
+                module.eval()
+
+    def assert_cl_is_frozen(self):
+        #assert self.freeze_cl
+
+        for module in (self.encoder.modules()):
+            for param in module.parameters():
+                assert not param.requires_grad
+
+            if isinstance(module, torch.nn.BatchNorm2d):
+                assert not module.training
+
+            if isinstance(module, torch.nn.Dropout):
+                assert not module.training
+
+        for module in (self.classification_head.modules()):
+            for param in module.parameters():
+                assert not param.requires_grad
+
+            if isinstance(module, torch.nn.BatchNorm2d):
+                assert not module.training
+
+            if isinstance(module, torch.nn.Dropout):
+                assert not module.training
+
+        return True
 
 class FCAMModel(torch.nn.Module):
     def initialize(self):

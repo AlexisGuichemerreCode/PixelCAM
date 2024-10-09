@@ -199,6 +199,8 @@ def get_args(args: dict, eval: bool = False):
                         help="Pre-trained weights.")
     parser.add_argument("--path_pre_trained", type=str, default=None,
                         help="Absolute/relative path to file of weights.")
+    parser.add_argument("--path_pre_trained_model_cl", type=str, default=None,
+                        help="Absolute/relative path to file of weights for EnergyCAM.")
     parser.add_argument("--support_background", type=str2bool, default=None,
                         help="use or not 1 extra plan for background cams.")
     parser.add_argument("--scale_in", type=float, default=None,
@@ -904,6 +906,8 @@ def get_args(args: dict, eval: bool = False):
             std_cl_args['task'] = constants.STD_CL
             tag = get_tag(Dict2Obj(std_cl_args), checkpoint_type=cl_cp)
 
+        elif args['method'] == constants.METHOD_ENERGY:
+            tag = args['model']['path_pre_trained_model_cl']
         else:
             cl_cp = args['eval_checkpoint_type']
             tag = get_tag(Dict2Obj(args), checkpoint_type=cl_cp)
@@ -1178,8 +1182,9 @@ def get_args(args: dict, eval: bool = False):
     assert isinstance(args.model['scale_in'], float)
 
     if args.task == constants.STD_CL:
-        assert not args.model['freeze_cl']
-        assert args.model['folder_pre_trained_cl'] in [None, '', 'None']
+        if args.method != constants.METHOD_ENERGY:
+            assert not args.model['freeze_cl']
+            assert args.model['folder_pre_trained_cl'] in [None, '', 'None']
 
     used_constraints_f_cl = [args.sl_fc,
                              args.crf_fc,

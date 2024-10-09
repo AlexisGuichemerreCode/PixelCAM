@@ -297,8 +297,8 @@ class PixelWise(_BasicPooler):
         self.name = 'PixelWise'
 
         classes = self.classes
-        if self.support_background:
-            classes = classes + 1
+        #if self.support_background:
+        #    classes = classes + 1
 
         #self.conv = nn.Conv2d(self.in_channels, out_channels=classes,
         #                      kernel_size=1)

@@ -236,6 +236,8 @@ def get_config(ds: str, fold: int, magnification: str) -> dict:
             # inside the model on the same device as the model.
             "freeze_cl": False,  # applied only for task F_CL/NEGEV. if true,
             # the classifier (encoder + head) is frozen.
+            "path_pre_trained_model_cl": None,
+            # Enter the name of the folder containing the weights of the classifier. 
             "folder_pre_trained_cl": None,
             # NAME of folder containing weights of
             # classifier. it must be in in 'pretrained' folder.

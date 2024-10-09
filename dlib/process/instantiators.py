@@ -1170,45 +1170,14 @@ def get_model(args, eval=False, eval_path_weights=''):
     DLLogger.log(log)
     DLLogger.log(model.get_info_nbr_params())
 
-    path_file = args.model['path_pre_trained']
-    if path_file not in [None, 'None']:
-        msg = "You have asked to load a specific pre-trained " \
-              "model from {} .... [OK]".format(path_file)
-        warnings.warn(msg)
-        DLLogger.log(msg)
-        pre_tr_state = torch.load(path_file, map_location=get_cpu_device())
-        model.load_state_dict(pre_tr_state, strict=args.model['strict'])
 
     path_cl = args.model['folder_pre_trained_cl']
-    if path_cl not in [None, 'None', '']:
-        assert args.task in [constants.F_CL, constants.NEGEV]
-
-        msg = "You have asked to set the classifier's weights " \
-              " from {} .... [OK]".format(path_cl)
+    if path_cl not in [None, 'None']:
+        msg = "You have asked to load a specific pre-trained " \
+              "model from {} .... [OK]".format(path_cl)
         warnings.warn(msg)
         DLLogger.log(msg)
-
-        if args.task == constants.NEGEV:
-            cl_cp = args.negev_ptretrained_cl_cp
-            std_cl_args = deepcopy(args)
-            std_cl_args.task = constants.STD_CL
-            tag = get_tag(std_cl_args, checkpoint_type=cl_cp)
-
-        else:
-            tag = get_tag(args)
-
-        if path_cl.endswith(os.sep):
-            source_tag = basename(path_cl[:-1])
-        else:
-            source_tag = basename(path_cl)
-
-        assert tag == source_tag, f'{tag}, {source_tag}'
-
-        if args.method in spec_mth:
-            weights = torch.load(join(path_cl, 'model.pt'),
-                                 map_location=get_cpu_device())
-            model.load_state_dict(weights, strict=True)
-        else:
+        if args.method == constants.METHOD_ENERGY:
             encoder_w = torch.load(join(path_cl, 'encoder.pt'),
                                    map_location=get_cpu_device())
             model.encoder.super_load_state_dict(encoder_w, strict=True)
@@ -1217,8 +1186,57 @@ def get_model(args, eval=False, eval_path_weights=''):
                                   map_location=get_cpu_device())
             model.classification_head.load_state_dict(header_w, strict=True)
 
+    path_file = args.model['path_pre_trained']
+    if path_file not in [None, 'None']:
+        msg = "You have asked to load a specific pre-trained " \
+              "model from {} .... [OK]".format(path_file)
+        warnings.warn(msg)
+        DLLogger.log(msg)
+        pre_tr_state = torch.load(path_file, map_location=get_cpu_device())
+        model.load_state_dict(pre_tr_state, strict=args.model['strict'])
+        
+
+    if args.task in [constants.F_CL, constants.NEGEV]:
+        path_cl = args.model['folder_pre_trained_cl']
+        if path_cl not in [None, 'None', '']:
+            assert args.task in [constants.F_CL, constants.NEGEV]
+
+            msg = "You have asked to set the classifier's weights " \
+                " from {} .... [OK]".format(path_cl)
+            warnings.warn(msg)
+            DLLogger.log(msg)
+
+            if args.task == constants.NEGEV:
+                cl_cp = args.negev_ptretrained_cl_cp
+                std_cl_args = deepcopy(args)
+                std_cl_args.task = constants.STD_CL
+                tag = get_tag(std_cl_args, checkpoint_type=cl_cp)
+
+            else:
+                tag = get_tag(args)
+
+            if path_cl.endswith(os.sep):
+                source_tag = basename(path_cl[:-1])
+            else:
+                source_tag = basename(path_cl)
+
+            assert tag == source_tag, f'{tag}, {source_tag}'
+
+            if args.method in spec_mth:
+                weights = torch.load(join(path_cl, 'model.pt'),
+                                    map_location=get_cpu_device())
+                model.load_state_dict(weights, strict=True)
+            else:
+                encoder_w = torch.load(join(path_cl, 'encoder.pt'),
+                                    map_location=get_cpu_device())
+                model.encoder.super_load_state_dict(encoder_w, strict=True)
+
+                header_w = torch.load(join(path_cl, 'classification_head.pt'),
+                                    map_location=get_cpu_device())
+                model.classification_head.load_state_dict(header_w, strict=True)
+
     if args.model['freeze_cl'] and not eval:
-        assert args.task in [constants.F_CL, constants.NEGEV]
+        assert args.task in [constants.F_CL, constants.NEGEV] or args.method == constants.METHOD_ENERGY
 
         assert args.model['folder_pre_trained_cl'] not in [None, 'None', '']
 
