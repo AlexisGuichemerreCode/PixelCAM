@@ -1,10 +1,10 @@
-DLLL 2024-10-04 01:09:42.060082 0:00:00.302543 
-==========================================================================================
- TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: GLAS 	 METHOD: DEEPMIL 	 ENCODER: RESNET50 	
-==========================================================================================
+DLLL 2024-10-14 01:00:21.584847 0:00:00.167262 
+===================================================================================================
+ TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: CAMELYON512 	 METHOD: GRADCAMPP 	 ENCODER: RESNET50 	
+===================================================================================================
 
-DLLL 2024-10-04 01:09:46.358653 0:00:04.601114 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 24036932
-DLLL 2024-10-04 01:09:46.358802 0:00:04.601263 Arch: STDClassifier
+DLLL 2024-10-14 01:00:22.457208 0:00:01.039623 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 23514179
+DLLL 2024-10-14 01:00:22.457361 0:00:01.039776 Arch: STDClassifier
 task: STD_CL
 encoder_name: resnet50
 encoder_weights: imagenet
@@ -16,10 +16,10 @@ aux_params:
 	kmin: 0.1
 	alpha: 0.6
 	dropout: 0.0
-	support_background: False
+	support_background: True
 	r: 10.0
 	mid_channels: 128
-	gated: True
+	gated: False
 	prm_ks: 3
 	prm_st: 1
 scale_in: 1.0
@@ -27,14 +27,14 @@ freeze_cl: False
 im_rec: False
 img_range: tanh 
 
-DLLL 2024-10-04 01:09:46.364631 0:00:04.607092 u-resnet50. Task: STD_CL. 
+DLLL 2024-10-14 01:00:22.463015 0:00:01.045430 u-resnet50. Task: STD_CL. 
  NBR-PARAMS: 
 	Encoder [resnet50]: 23508032. 
-	Classification head [DeepMIL]: 528900. 
-	Total: 24036932. 
+	Classification head [WGAP]: 6147. 
+	Total: 23514179. 
 
-DLLL 2024-10-04 01:09:52.379682 0:00:10.622143 
+DLLL 2024-10-14 01:00:22.557361 0:00:01.139776 
 ========================================================================================================================
- MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/HISTOLOGY_PROJECT/MODEL_BENCHMARK_SFUDA/SOURCE_MODELS/BLOC/GLAS/ID_SOURCE_8_GLAS_DEEPMIL_150-TSK_STD_CL-DS_GLAS-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_DEEPMIL-SPOOLING_DEEPMIL-ARCH_STDCLASSIFIER-ECD_RESNET50/GLAS-0-RESNET50-DEEPMIL-DEEPMIL-CP_BEST_LOCALIZATION
+ MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/MODEL_CVPR_2025/CAMELYON512/BLOC/ID_SOURCE_13_CAMELYON512_GRADCAMPP_2-TSK_STD_CL-DS_CAMELYON512-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_GRADCAMPP-SPOOLING_WGAP-ARCH_STDCLASSIFIER-ECD_RESNET50/CAMELYON512-0-RESNET50-GRADCAMPP-WGAP-CP_BEST_LOCALIZATION
 ========================================================================================================================
 

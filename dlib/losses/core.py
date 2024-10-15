@@ -1084,7 +1084,9 @@ class EnergyCEloss(ElementaryLoss):
         super(EnergyCEloss, self).__init__(**kwargs)
 
         self.ece_lambda = 0.0
+        self.negative_c: int = 0
         self._is_already_set = False
+        self.dataset = kwargs['dataset']
         self.loss = nn.CrossEntropyLoss(reduction="mean", ignore_index=-255).to(self._device)
 
     def set_it(self, ece_lambda):
@@ -1113,34 +1115,19 @@ class EnergyCEloss(ElementaryLoss):
         if not self.is_on():
             return self._zero
         
-        # #Position of foreground and background from pre-trained CAM
-        # indices_1 = (seeds == 1).nonzero(as_tuple=False)
-        # indices_0 = (seeds == 0).nonzero(as_tuple=False)
+        if self.dataset in constants.CAMELYON512:
+            ind_neg = (glabel == self.negative_c).nonzero().view(-1)
+            nbr = ind_neg.numel()
 
-        # retrieved_values_1 = []
+            if nbr == 0:
+                return self._zero
 
-        # for idx in indices_1:
-        #     batch_idx, x, y = idx
-        #     values = model.cams[batch_idx, :, x, y]
-        #     retrieved_values_1.append(values)
-        
-        # retrieved_values_1 = torch.stack(retrieved_values_1)
-        # labels_1 = torch.ones(len(retrieved_values_1), dtype=torch.long)
+            _, h, w = seeds.shape
 
-        # retrieved_values_0 = []
+            zero_matrix = torch.zeros((h, w), dtype=seeds.dtype, device=seeds.device)
 
-        # for idx in indices_0:
-        #     batch_idx, x, y = idx
-        #     values = model.cams[batch_idx, :, x, y]
-        #     retrieved_values_0.append(values)
-        
-        # retrieved_values_0 = torch.stack(retrieved_values_0)
-        # labels_0 = torch.zeros(len(retrieved_values_0), dtype=torch.long)
-
-        # combined_values = torch.cat((retrieved_values_1, retrieved_values_0), dim=0).to(self._device)
-        # combined_labels = torch.cat((labels_1, labels_0), dim=0).to(self._device)
-
-        # loss = self.loss(combined_values, combined_labels) * self.ece_lambda
+            for idx in ind_neg:
+                seeds[idx] = zero_matrix
 
         loss = self.loss(model.cams,seeds)  * self.ece_lambda
 

@@ -28,7 +28,8 @@ class ElementaryLoss(nn.Module):
                  scale_factor=0.5,
                  start_epoch=None,
                  end_epoch=None,
-                 seg_ignore_idx=-255
+                 seg_ignore_idx=-255,
+                 dataset=None,
                  ):
         super(ElementaryLoss, self).__init__()
         self._name = name

@@ -727,7 +727,8 @@ def get_loss_source(args):
             EnergyCE_loss = losses.EnergyCEloss(
                     cuda_id=args.c_cudaid,
                     support_background=support_background,
-                    multi_label_flag=multi_label_flag)
+                    multi_label_flag=multi_label_flag,
+                    dataset=args.dataset)
             EnergyCE_loss.set_it(ece_lambda=args.ece_lambda)
             masterloss.add(EnergyCE_loss)
 

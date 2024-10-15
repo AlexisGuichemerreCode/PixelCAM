@@ -18,6 +18,8 @@ from dlib.unet.model import UnetFCAM
 from dlib.unet.model import UnetNEGEV
 from dlib.unet.model import Unet
 
+from  dlib.configure import constants
+
 from dlib.parallel import MyDDP as DDP
 
 
@@ -541,13 +543,14 @@ class EnergyCAM:
 
     def __init__(
         self,
-        model: Union[STDClassifier, UnetFCAM, UnetNEGEV, Unet]
+        model: Union[STDClassifier, UnetFCAM, UnetNEGEV, Unet],
+        dataset = str
     ) -> None:
 
         self.assert_model(model)
 
         self.model = model
-        
+        self.dataset = dataset
 
     @staticmethod
     def assert_model(model: Union[UnetFCAM, Unet]) -> None:
@@ -580,6 +583,8 @@ class EnergyCAM:
                  argmax: bool = False) -> Tensor:
 
         # Compute CAM: (h, w)
+        predicted_class = scores.argmax(dim=1)
+        self.predicted_class = predicted_class
         cam = self.compute_cams(argmax=argmax)
         if reshape is not None:
             assert len(reshape) == 2
@@ -609,11 +614,15 @@ class EnergyCAM:
         assert cams.shape[0] == 1
         assert cams.shape[1] == 2
 
+        if self.dataset == constants.GLAS:
+            idx = 1
+        else:
+            idx = self.predicted_class.item()
+            
         if argmax:
             cam = torch.argmax(cams, dim=1).squeeze(0).float()  # (h, w)
         else:
-            cam = torch.softmax(cams, dim=1)[:, 1, :, :].squeeze(0)  # (h, w)
-
+            cam = torch.softmax(cams, dim=1)[:, idx, :, :].squeeze(0)  # (h, w)
 
         return cam
 

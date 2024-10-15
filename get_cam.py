@@ -366,6 +366,7 @@ def get_cam(exp_path, checkpoint_type, dataset, cudaid, split='train', tmp_outd=
         # args_dict = yaml.safe_load(fy)
         # args_dict['model']['freeze_encoder'] = False
         args_dict['pixel_wise_classification'] = False
+        #args_dict['model']['spatial_dropout'] = 0.0
         args = Dict2Obj(args_dict)
         args.outd = tmp_outd
         args.distributed = False
@@ -493,10 +494,14 @@ def get_cam(exp_path, checkpoint_type, dataset, cudaid, split='train', tmp_outd=
                 # cam_np = ((cam_np - cam_np.min()) * (1/(cam_np.max() - cam_np.min()) * 255)).astype('uint8')
                 # cam_img = Image.fromarray(cam_np)
 
-                image_idx = os.path.basename(image_id)
-                file_wo_bmp = os.path.splitext(image_idx)[0]
+
+                # image_idx = os.path.basename(image_id)
+                # file_wo_bmp = os.path.splitext(image_idx)[0]
+                # output_path = path_cam + '_' + file_pt
+                tmp = str(Path(image_id).with_suffix(''))
+                file_wo_bmp = tmp.replace('/', '_')
                 file_pt = f'{file_wo_bmp}.pt'
-                output_path = path_cam + '_' + file_pt
+                output_path = path_cam + '/' + file_pt
                 torch.save(cam, output_path)
 
 
@@ -580,7 +585,7 @@ def fast_eval():
 
 
             #Get features at the pixel level
-            overlay_images, input_images, method_name, gt_masks = get_cam(exp_path=exp_path,checkpoint_type=checkpoint_type, dataset=parsedargs.source_dataset, cudaid=parsedargs.cudaid, split='train', tmp_outd='tmp_outd', path_cam = parsedargs.path_cam, parsedargs=parsedargs)
+            overlay_images, input_images, method_name, gt_masks = get_cam(exp_path=exp_path,checkpoint_type=checkpoint_type, dataset=parsedargs.source_dataset, cudaid=parsedargs.cudaid, split='train', tmp_outd='tmp_outd', path_cam = '/export/livia/home/vision/Aguichemerre/Pixel-Adaptation/data_cams/resnet50-gradcampp-bloc-camelyon_cams_train', parsedargs=parsedargs)
 
 if __name__ == '__main__':
     fast_eval()

@@ -962,7 +962,6 @@ def get_args(args: dict, eval: bool = False):
         for split in constants.SPLITS:
             #args['std_cams_folder']['train'] = args['path_cam']
             tag = args['path_cam']
-
             tag += '_cams_{}'.format(split)
 
             if is_cc():

@@ -63,7 +63,7 @@ def build_seg_extractor(model, args):
 def build_std_cam_extractor(classifier, args):
 
     if args.method == constants.METHOD_ENERGY:
-        return EnergyCAM(model=classifier)
+        return EnergyCAM(model=classifier, dataset=args.dataset)
 
     p1 = [constants.GAP, constants.MAXPOOL, constants.WILDCATHEAD,
           constants.LSEPOOL, constants.PRM]

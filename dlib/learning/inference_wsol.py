@@ -205,6 +205,7 @@ class CAMComputer(object):
                 cl_logits = output
                 cam = self.std_cam_extractor(
                                          class_idx=target,
+                                         scores=cl_logits,
                                          normalized=True,
                                          reshape=img_shape if self.special1
                                          else None)

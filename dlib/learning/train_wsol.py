@@ -469,7 +469,7 @@ class Trainer(Basic):
 
     def get_std_cams_minibatch(self, images, targets) -> torch.Tensor:
         # used only for task f_cl/negev
-        assert self.args.task in [constants.F_CL, constants.NEGEV] or self.args.task == S
+        assert self.args.task in [constants.F_CL, constants.NEGEV]
         assert images.ndim == 4
         image_size = images.shape[2:]
 
