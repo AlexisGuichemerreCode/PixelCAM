@@ -411,7 +411,8 @@ class Trainer(Basic):
                     fg_erode_iter=args.sl_fg_erode_iter,
                     support_background=args.model['support_background'],
                     multi_label_flag=args.multi_label_flag,
-                    seg_ignore_idx=args.seg_ignore_idx)
+                    seg_ignore_idx=args.seg_ignore_idx,
+                    neg_samples_partial=args.neg_samples_partial)
 
         elif args.task == constants.NEGEV:
 
@@ -633,12 +634,13 @@ class Trainer(Basic):
                         cams_inter = std_cams
 
                     with torch.no_grad():
-                        seeds = self.sl_mask_builder(cams_inter)
+                        seeds = self.sl_mask_builder(cams_inter, class_idx= targets)
 
                 cl_logits = output
             
                 loss = self.loss(epoch=self.epoch,
                                  model=self.model,
+                                 fcams=self.model.cams,
                                  cl_logits=cl_logits,
                                  glabel=y_global,
                                  pseudo_glabel=y_pl_global,

@@ -585,7 +585,7 @@ def fast_eval():
 
 
             #Get features at the pixel level
-            overlay_images, input_images, method_name, gt_masks = get_cam(exp_path=exp_path,checkpoint_type=checkpoint_type, dataset=parsedargs.source_dataset, cudaid=parsedargs.cudaid, split='train', tmp_outd='tmp_outd', path_cam = '/export/livia/home/vision/Aguichemerre/Pixel-Adaptation/data_cams/resnet50-gradcampp-bloc-camelyon_cams_train', parsedargs=parsedargs)
+            overlay_images, input_images, method_name, gt_masks = get_cam(exp_path=exp_path,checkpoint_type=checkpoint_type, dataset=parsedargs.source_dataset, cudaid=parsedargs.cudaid, split='train', tmp_outd='tmp_outd', path_cam = '/export/livia/home/vision/Aguichemerre/Pixel-Adaptation/data_cams/resnet50-deepmil-bloc-camelyon_cams_train', parsedargs=parsedargs)
 
 if __name__ == '__main__':
     fast_eval()

@@ -553,7 +553,7 @@ class EnergyCAM:
         self.dataset = dataset
 
     @staticmethod
-    def assert_model(model: Union[UnetFCAM, Unet]) -> None:
+    def assert_model(model: Union[STDClassifier, UnetFCAM, Unet]) -> None:
         # _model = model if not isinstance(model, DDP) else model.module
 
         _model = model
@@ -583,8 +583,9 @@ class EnergyCAM:
                  argmax: bool = False) -> Tensor:
 
         # Compute CAM: (h, w)
-        predicted_class = scores.argmax(dim=1)
-        self.predicted_class = predicted_class
+        #predicted_class = scores.argmax(dim=1)
+        #self.predicted_class = predicted_class
+        self.predicted_class = class_idx
         cam = self.compute_cams(argmax=argmax)
         if reshape is not None:
             assert len(reshape) == 2
@@ -617,7 +618,7 @@ class EnergyCAM:
         if self.dataset == constants.GLAS:
             idx = 1
         else:
-            idx = self.predicted_class.item()
+            idx = self.predicted_class
             
         if argmax:
             cam = torch.argmax(cams, dim=1).squeeze(0).float()  # (h, w)

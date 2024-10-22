@@ -1079,19 +1079,83 @@ class SatLoss(ElementaryLoss):
         # loss =  loss_cls +  torch.abs(sat_aux_losses['ba_loss'] - sat_area_th).mean(0) + sat_aux_losses['norm_loss']
         return loss
 
-class EnergyCEloss(ElementaryLoss):
+# class EnergyCEloss(ElementaryLoss):
+#     def __init__(self, **kwargs):
+#         super(EnergyCEloss, self).__init__(**kwargs)
+
+#         self.ece_lambda = 0.0
+#         self.negative_c: int = 0
+#         self._is_already_set = False
+#         self.dataset = kwargs['dataset']
+#         self.loss = nn.CrossEntropyLoss(reduction="mean", ignore_index=-255).to(self._device)
+
+#     def set_it(self, ece_lambda):
+
+#         self.ece_lambda = ece_lambda
+#         self._is_already_set = True
+
+#     def forward(self,
+#                 epoch=0,
+#                 model=None,
+#                 cams_inter=None,
+#                 fcams=None,
+#                 cl_logits=None,
+#                 glabel=None,
+#                 raw_img=None,
+#                 x_in=None,
+#                 im_recon=None,
+#                 seeds=None,
+#                 sat_aux_losses = None,
+#                 sat_area_th = None,
+#                 pseudo_glabel = None,
+#                 cutmix_holder = None,
+#                 ):
+#         super(EnergyCEloss, self).forward(epoch=epoch)
+
+#         if not self.is_on():
+#             return self._zero
+        
+#         if self.dataset in constants.CAMELYON512:
+#             ind_neg = (glabel == self.negative_c).nonzero().view(-1)
+#             nbr = ind_neg.numel()
+
+#             if nbr == 0:
+#                 return self._zero
+
+#             _, h, w = seeds.shape
+
+#             zero_matrix = torch.full((h, w), -255, dtype=seeds.dtype, device=seeds.device)
+
+#             for idx in ind_neg:
+#                 seeds[idx] = zero_matrix
+
+#         loss = self.loss(model.cams,seeds)  * self.ece_lambda
+
+
+#         return loss
+
+class EnergyCEloss(SelfLearningFcams):
     def __init__(self, **kwargs):
         super(EnergyCEloss, self).__init__(**kwargs)
 
-        self.ece_lambda = 0.0
-        self.negative_c: int = 0
-        self._is_already_set = False
-        self.dataset = kwargs['dataset']
-        self.loss = nn.CrossEntropyLoss(reduction="mean", ignore_index=-255).to(self._device)
+        self.loss = nn.CrossEntropyLoss(
+            reduction="mean", ignore_index=self.seg_ignore_idx).to(self._device)
 
-    def set_it(self, ece_lambda):
+        self.ece_lambda = 0.0
+        self.apply_negative_samples: bool = False
+        self.negative_c: int = 0
+
+        self._is_already_set = False
+
+    def set_it(self,ece_lambda, apply_negative_samples: bool, negative_c: int):
+        assert isinstance(apply_negative_samples, bool)
+        assert isinstance(negative_c, int)
+        assert negative_c >= 0
 
         self.ece_lambda = ece_lambda
+        self.negative_c = negative_c
+        self.apply_negative_samples = apply_negative_samples
+
         self._is_already_set = True
 
     def forward(self,
@@ -1100,39 +1164,39 @@ class EnergyCEloss(ElementaryLoss):
                 cams_inter=None,
                 fcams=None,
                 cl_logits=None,
+                seg_logits=None,
                 glabel=None,
+                pseudo_glabel=None,
+                masks=None,
                 raw_img=None,
                 x_in=None,
                 im_recon=None,
                 seeds=None,
-                sat_aux_losses = None,
-                sat_area_th = None,
-                pseudo_glabel = None,
-                cutmix_holder = None,
+                cutmix_holder=None,
+                key_arg: dict = None
                 ):
-        super(EnergyCEloss, self).forward(epoch=epoch)
+        super(SelfLearningFcams, self).forward(epoch=epoch)
+
+        assert self._is_already_set
 
         if not self.is_on():
             return self._zero
-        
-        if self.dataset in constants.CAMELYON512:
-            ind_neg = (glabel == self.negative_c).nonzero().view(-1)
-            nbr = ind_neg.numel()
 
-            if nbr == 0:
-                return self._zero
+        assert not self.multi_label_flag
 
-            _, h, w = seeds.shape
+        if not self.apply_negative_samples:
+            return self.loss(input=fcams, target=seeds) * self.ece_lambda
 
-            zero_matrix = torch.zeros((h, w), dtype=seeds.dtype, device=seeds.device)
+        ind_non_neg = (glabel != self.negative_c).nonzero().view(-1)
 
-            for idx in ind_neg:
-                seeds[idx] = zero_matrix
+        nbr = ind_non_neg.numel()
 
-        loss = self.loss(model.cams,seeds)  * self.ece_lambda
+        if nbr == 0:
+            return self._zero
 
-
-        return loss
+        fcams_n_neg = fcams[ind_non_neg]
+        seeds_n_neg = seeds[ind_non_neg]
+        return self.loss(input=fcams_n_neg, target=seeds_n_neg) * self.ece_lambda
     
 
 class ConRanFieldPxcams(ElementaryLoss):

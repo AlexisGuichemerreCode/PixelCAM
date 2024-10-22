@@ -729,8 +729,28 @@ def get_loss_source(args):
                     support_background=support_background,
                     multi_label_flag=multi_label_flag,
                     dataset=args.dataset)
-            EnergyCE_loss.set_it(ece_lambda=args.ece_lambda)
+            
+            if args.dataset == constants.GLAS:
+                negative_samples = False
+            elif args.dataset == constants.CAMELYON512 and args.neg_samples_partial:
+                negative_samples = False
+            elif args.dataset == constants.CAMELYON512:
+                negative_samples = True
+            
+            EnergyCE_loss.set_it(ece_lambda=args.ece_lambda, apply_negative_samples=negative_samples, negative_c=constants.DS_NEG_CL[args.dataset])
             masterloss.add(EnergyCE_loss)
+
+        if args.neg_samples_ng:
+            lnegs = losses.NegativeSamplesNegev(
+                cuda_id=args.c_cudaid,
+                lambda_=args.neg_samples_ng_lambda,
+                support_background=support_background,
+                multi_label_flag=multi_label_flag,
+                start_epoch=args.neg_samples_ng_start_ep,
+                end_epoch=args.neg_samples_ng_end_ep
+            )
+            lnegs.set_it(negative_c=constants.DS_NEG_CL[args.dataset])
+            masterloss.add(lnegs)
 
         if args.crf_fc:
             masterloss.add(losses.ConRanFieldPxcams(
@@ -742,6 +762,8 @@ def get_loss_source(args):
                 multi_label_flag=multi_label_flag,
                 start_epoch=args.crf_start_ep, end_epoch=args.crf_end_ep,
             ))
+
+
         # if args.eng_marginal:
         #     EnergyMarginal_loss = losses.EnergyMGloss(
         #             cuda_id=args.c_cudaid,

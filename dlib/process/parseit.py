@@ -494,6 +494,9 @@ def get_args(args: dict, eval: bool = False):
                         help='parameter to control the creation of the second head for localization for Energy Model')
     parser.add_argument('--path_cam', type=str, default=None)
 
+    parser.add_argument('--neg_samples_partial', type=str2bool, default=None,
+                        help='use or not negative samples partial pixel-wise')
+
     parser.add_argument('--ece', type=str2bool, default=None)
     parser.add_argument('--ece_lambda', type=float, default=None, 
                         help='ECE: lambda value for loss .')

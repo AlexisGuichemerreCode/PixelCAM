@@ -309,7 +309,7 @@ def get_visaualization(exp_path, target_method, sf_uda_source_folder, checkpoint
     model.eval()
 
     # basic_config = config.get_config(ds=args.dataset, fold=args.fold, magnification=args.magnification)
-    basic_config = config.get_config(ds=constants.GLAS, fold=args.fold, magnification=args.magnification)
+    basic_config = config.get_config(ds=constants.CAMELYON512, fold=args.fold, magnification=args.magnification)
 
     args.data_paths = basic_config['data_paths']
     args.metadata_root = basic_config['metadata_root']
@@ -413,7 +413,7 @@ def get_visaualization(exp_path, target_method, sf_uda_source_folder, checkpoint
                 #            cam_computer.evaluator.mask_paths[image_id],
                 #            cam_computer.evaluator.ignore_paths[image_id])
 
-                gt_annotation =  Image.open(os.path.join(f'/export/livia/home/vision/Aguichemerre/datasets/{dataset}', cam_computer.evaluator.mask_paths[image_id][0]))
+                gt_annotation =  Image.open(os.path.join(f'/export/gauss/vision/Aguichemerre/datasets/{dataset}', cam_computer.evaluator.mask_paths[image_id][0]))
                 gt_annotation = gt_annotation.resize(image_size)
                 gt_annotation=np.asarray(gt_annotation)
                 gt_annotation = (gt_annotation > 0).astype(np.uint8)
@@ -468,7 +468,7 @@ def fast_eval():
     DLLogger.init_arb(backends=log_backends, master_pid=os.getpid())
     ##########
 
-    base_checkpoint_types = [constants.BEST_LOC]
+    base_checkpoint_types = [constants.BEST_CL]
         
     for checkpoint_type_extended in base_checkpoint_types:
         checkpoint_type = checkpoint_type_extended
@@ -484,7 +484,8 @@ def fast_eval():
         
         _CODE_FUNCTION = 'fast_eval_{}'.format(split)
 
-        target_methods = ['CAM', 'GradCAMpp', 'NEGEV','EnergyCAM']
+        target_methods = ['EnergyCAM']
+        #'CAM', 'GradCAMpp', 'NEGEV',
         # target_methods = ['ADADSA']GradCAMpp'EnergyCAM', 'NEGEV', 
         #create fig len(parsedargs.image_ids_to_draw) row and len(target_methods) columns
         fig, axs = plt.subplots(len(parsedargs.image_ids_to_draw), len(target_methods)+2, figsize=((len(target_methods)+2)*1.9, 2*len(parsedargs.image_ids_to_draw)))

@@ -127,12 +127,12 @@ class _STBG(nn.Module):
 
 
 class _STOneSample(nn.Module):
-    def __init__(self, min_, max_, nbr_bg):
+    def __init__(self, min_, max_, nbr_bg, neg_samples_partial):
         super(_STOneSample, self).__init__()
 
         self.min_ = min_
         self.max_ = max_
-
+        self.neg_samples_partial = neg_samples_partial
         self.otsu = _STOtsu()
         self.fg_capture = _STFG(max_=max_)
         self.bg_capture = _STBG(nbr_bg=nbr_bg, min_=min_)
@@ -161,6 +161,10 @@ class _STOneSample(nn.Module):
 
         if self.otsu.bad_egg:
             return fg, bg
+        
+        if self.neg_samples_partial:
+            bg = self.bg_capture(cam=cam, bg=bg)
+            return fg, bg
 
         # ROI
         roi = (cam_ > th).long()
@@ -181,14 +185,14 @@ class MBSeederSLFCAMS(nn.Module):
                  ksz: int,
                  support_background: bool,
                  multi_label_flag: bool,
-                 seg_ignore_idx: int
+                 seg_ignore_idx: int,
+                 neg_samples_partial: bool = False
                  ):
         super(MBSeederSLFCAMS, self).__init__()
 
         assert not multi_label_flag
 
         self._device = torch.device('cuda')
-
         assert isinstance(ksz, int)
         assert ksz > 0
         self.ksz = ksz
@@ -205,10 +209,12 @@ class MBSeederSLFCAMS(nn.Module):
 
         self.min_ = min_
         self.max_ = max_
-
+        
         assert isinstance(min_p, float)
         assert 0. <= min_p <= 1.
         self.min_p = min_p
+
+        self.neg_samples_partial = neg_samples_partial
 
         # fg
         assert isinstance(fg_erode_k, int)
@@ -268,7 +274,7 @@ class MBSeederSLFCAMS(nn.Module):
     def identity(self, x):
         return x
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, class_idx = None) -> torch.Tensor:
         assert isinstance(x, torch.Tensor)
         assert x.ndim == 4
 
@@ -301,10 +307,17 @@ class MBSeederSLFCAMS(nn.Module):
         all_bg = torch.zeros((b, h, w), dtype=torch.long, device=x.device,
                              requires_grad=False)
 
-        opx = _STOneSample(min_=self.min_, max_=self.max_, nbr_bg=nbr_bg)
+        opx = _STOneSample(min_=self.min_, max_=self.max_, nbr_bg=nbr_bg, neg_samples_partial=False)
 
+        if self.neg_samples_partial:
+            self_all_bg = int(h * w)
+            opx_neg = _STOneSample(min_= self.min_, max_=self.max_, nbr_bg=self_all_bg, neg_samples_partial=self.neg_samples_partial)
+        
         for i in range(b):
-            all_fg[i], all_bg[i] = opx(cam=x[i].squeeze(), erode=erode)
+            if self.neg_samples_partial and class_idx[i] == 0:
+                _, all_bg[i] = opx_neg(cam=x[i].squeeze(), erode=erode)
+            else:
+                all_fg[i], all_bg[i] = opx(cam=x[i].squeeze(), erode=erode)
 
         # fg
         all_fg = dilate(all_fg.unsqueeze(1)).squeeze(1)
