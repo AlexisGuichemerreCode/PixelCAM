@@ -385,6 +385,7 @@ def get_visaualization(exp_path, target_method, sf_uda_source_folder, checkpoint
     for batch_idx, (images, targets, _, image_ids, _, _, _, _) in tqdm(
         enumerate(loaders[split]), ncols=constants.NCOLS,
         total=len(loaders[split])):
+        print(batch_idx)
         image_size = images.shape[2:]
         images = images.to(device)
         targets = targets.to(device)
@@ -412,14 +413,16 @@ def get_visaualization(exp_path, target_method, sf_uda_source_folder, checkpoint
                 # gt_mask = get_mask('f/export/livia/home/vision/Aguichemerre/datasets/{dataset}',
                 #            cam_computer.evaluator.mask_paths[image_id],
                 #            cam_computer.evaluator.ignore_paths[image_id])
+                if target == 1:
+                    gt_annotation =  Image.open(os.path.join(f'/export/gauss/vision/Aguichemerre/datasets/{dataset}', cam_computer.evaluator.mask_paths[image_id][0]))
+                    gt_annotation = gt_annotation.resize(image_size)
+                    gt_annotation=np.asarray(gt_annotation)
+                    gt_annotation = (gt_annotation > 0).astype(np.uint8)
+                    gt_masks[image_id]=np.asarray(gt_annotation)
+                else:
+                    gt_masks[image_id] = np.zeros(image_size, dtype=np.uint8)
 
-                gt_annotation =  Image.open(os.path.join(f'/export/gauss/vision/Aguichemerre/datasets/{dataset}', cam_computer.evaluator.mask_paths[image_id][0]))
-                gt_annotation = gt_annotation.resize(image_size)
-                gt_annotation=np.asarray(gt_annotation)
-                gt_annotation = (gt_annotation > 0).astype(np.uint8)
-                gt_masks[image_id]=np.asarray(gt_annotation)
-
-        return overlay_images, input_images, method_name, gt_masks
+    return overlay_images, input_images, method_name, gt_masks
 
 def fast_eval():
     t0 = dt.datetime.now()
@@ -468,7 +471,7 @@ def fast_eval():
     DLLogger.init_arb(backends=log_backends, master_pid=os.getpid())
     ##########
 
-    base_checkpoint_types = [constants.BEST_CL]
+    base_checkpoint_types = [constants.BEST_LOC]
         
     for checkpoint_type_extended in base_checkpoint_types:
         checkpoint_type = checkpoint_type_extended
@@ -484,7 +487,7 @@ def fast_eval():
         
         _CODE_FUNCTION = 'fast_eval_{}'.format(split)
 
-        target_methods = ['EnergyCAM']
+        target_methods = ['DeepMIL','EnergyCAM']
         #'CAM', 'GradCAMpp', 'NEGEV',
         # target_methods = ['ADADSA']GradCAMpp'EnergyCAM', 'NEGEV', 
         #create fig len(parsedargs.image_ids_to_draw) row and len(target_methods) columns
