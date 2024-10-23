@@ -638,12 +638,13 @@ def get_loss_source(args):
             masterloss.add(loss)
 
         else:
-            cl_loss = losses.ClLoss(
-                cuda_id=args.c_cudaid,
-                support_background=support_background,
-                multi_label_flag=multi_label_flag)
-            cl_loss.set_it(ce_label_smoothing=args.ce_label_smoothing)
-            masterloss.add(cl_loss)
+            if args.model['image_classifier']:
+                cl_loss = losses.ClLoss(
+                    cuda_id=args.c_cudaid,
+                    support_background=support_background,
+                    multi_label_flag=multi_label_flag)
+                cl_loss.set_it(ce_label_smoothing=args.ce_label_smoothing)
+                masterloss.add(cl_loss)
 
     elif args.task == constants.SEG:
         masterloss.add(losses.SegLoss(

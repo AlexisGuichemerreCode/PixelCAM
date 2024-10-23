@@ -234,6 +234,7 @@ def get_config(ds: str, fold: int, magnification: str) -> dict:
             "scale_in": 1.,  # float > 0.  how much to scale
             # the input image to not overflow the memory. This scaling is done
             # inside the model on the same device as the model.
+            "image_classifier": True,  #useful if you want to consider to train the image classifier or not.
             "freeze_cl": False,  # applied only for task F_CL/NEGEV. if true,
             # the classifier (encoder + head) is frozen.
             "path_pre_trained_model_cl": None,

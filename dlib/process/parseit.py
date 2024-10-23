@@ -205,7 +205,8 @@ def get_args(args: dict, eval: bool = False):
                         help="use or not 1 extra plan for background cams.")
     parser.add_argument("--scale_in", type=float, default=None,
                         help="How much to scale the input.")
-
+    parser.add_argument("--image_classifier", type=str2bool, default=None,
+                        help="whether or not to train the image classifier.")
     parser.add_argument("--freeze_cl", type=str2bool, default=None,
                         help="whether or not to freeze the classifier.")
     parser.add_argument("--folder_pre_trained_cl", type=str, default=None,
