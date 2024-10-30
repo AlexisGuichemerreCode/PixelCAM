@@ -348,9 +348,9 @@ class PixelWise(_BasicPooler):
         x = self.layer1(x)
         x = self.layer2(x)
         x = self.layer3(x)
+        #logits = x
+        #logits = x
         logits = self.conv4(x)
-        
-        #logits = self.conv(x)
         if return_cams:
             self.cams = logits
         return logits

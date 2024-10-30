@@ -1,10 +1,10 @@
-DLLL 2024-10-22 13:19:25.784678 0:00:00.614711 
+DLLL 2024-10-29 13:17:30.618584 0:00:01.311484 
 =================================================================================================
  TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: CAMELYON512 	 METHOD: DEEPMIL 	 ENCODER: RESNET50 	
 =================================================================================================
 
-DLLL 2024-10-22 13:19:26.556873 0:00:01.386906 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 24036932
-DLLL 2024-10-22 13:19:26.557018 0:00:01.387051 Arch: STDClassifier
+DLLL 2024-10-29 13:17:31.930951 0:00:02.623851 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 24036932
+DLLL 2024-10-29 13:17:31.931346 0:00:02.624246 Arch: STDClassifier
 task: STD_CL
 encoder_name: resnet50
 encoder_weights: imagenet
@@ -27,24 +27,24 @@ freeze_cl: False
 im_rec: False
 img_range: tanh 
 
-DLLL 2024-10-22 13:19:26.561199 0:00:01.391232 u-resnet50. Task: STD_CL. 
+DLLL 2024-10-29 13:17:31.935565 0:00:02.628465 u-resnet50. Task: STD_CL. 
  NBR-PARAMS: 
 	Encoder [resnet50]: 23508032. 
 	Classification head [DeepMIL]: 528900. 
 	Total: 24036932. 
 
-DLLL 2024-10-22 13:19:26.662117 0:00:01.492150 
+DLLL 2024-10-29 13:17:32.026574 0:00:02.719474 
 ========================================================================================================================
  MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/MODEL_CVPR_2025/CAMELYON512/BLOC/ID_SOURCE_12_CAMELYON512_DEEPMIL_5-TSK_STD_CL-DS_CAMELYON512-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_DEEPMIL-SPOOLING_DEEPMIL-ARCH_STDCLASSIFIER-ECD_RESNET50/CAMELYON512-0-RESNET50-DEEPMIL-DEEPMIL-CP_BEST_LOCALIZATION
 ========================================================================================================================
 
-DLLL 2024-10-22 13:20:49.277334 0:01:24.107367 
+DLLL 2024-10-29 13:19:08.738266 0:01:39.431166 
 ===================================================================================================
  TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: CAMELYON512 	 METHOD: ENERGYCAM 	 ENCODER: RESNET50 	
 ===================================================================================================
 
-DLLL 2024-10-22 13:20:50.049686 0:01:24.879719 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 26272581
-DLLL 2024-10-22 13:20:50.049874 0:01:24.879907 Arch: STDClassifier
+DLLL 2024-10-29 13:19:09.958705 0:01:40.651605 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 23551045
+DLLL 2024-10-29 13:19:09.958868 0:01:40.651768 Arch: STDClassifier
 task: STD_CL
 encoder_name: resnet50
 encoder_weights: imagenet
@@ -67,15 +67,15 @@ freeze_cl: False
 im_rec: False
 img_range: tanh 
 
-DLLL 2024-10-22 13:20:50.054211 0:01:24.884244 u-resnet50. Task: STD_CL. 
+DLLL 2024-10-29 13:19:09.966487 0:01:40.659387 u-resnet50. Task: STD_CL. 
  NBR-PARAMS: 
 	Encoder [resnet50]: 23508032. 
 	Classification head [WGAP]: 6147. 
-	Pixel Wise Classification head [PixelWise]: 2758402. 
-	Total: 26272581. 
+	Pixel Wise Classification head [PixelWise]: 36866. 
+	Total: 23551045. 
 
-DLLL 2024-10-22 13:20:50.172031 0:01:25.002064 
+DLLL 2024-10-29 13:19:13.112953 0:01:43.805853 
 ========================================================================================================================
- MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/MODEL_CVPR_2025/CAMELYON512/BLOC/ID_SOURCE_28_CAMELYON512_ENERGYCAM_DEEPMIL_8_LOC-TSK_STD_CL-DS_CAMELYON512-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_ENERGYCAM-SPOOLING_WGAP-ARCH_STDCLASSIFIER-ECD_RESNET50/CAMELYON512-0-RESNET50-ENERGYCAM-WGAP-CP_BEST_LOCALIZATION
+ MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/MODEL_CVPR_2025/CAMELYON512/BLOC/ID_SOURCE_18_3C_CAMELYON512_ENERGYCAM_DEEPMIL_2_LOC-TSK_STD_CL-DS_CAMELYON512-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_ENERGYCAM-SPOOLING_WGAP-ARCH_STDCLASSIFIER-ECD_RESNET50/CAMELYON512-0-RESNET50-ENERGYCAM-WGAP-CP_BEST_LOCALIZATION
 ========================================================================================================================
 

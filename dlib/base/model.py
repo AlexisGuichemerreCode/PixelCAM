@@ -34,14 +34,19 @@ class STDClModel(torch.nn.Module):
         cl_logits = self.classification_head(self.dropout_2d(features[-1]))
         self.encoder_last_features = features[-1]
 
+        # if self.pixel_wise_classification:
+        #     _, _, target_height, target_width = x_shape
+        #     resized_features = F.interpolate(self.encoder_last_features, size=(target_height, target_width), mode='bilinear', align_corners=False)
+        #     self.cams = self.pixel_wise_classification_head(resized_features)
+        
+        # return cl_logits
         if self.pixel_wise_classification:
             loc_logits = self.pixel_wise_classification_head(features[-1])
             _, _, target_height, target_width = x.shape
             resized_logits = F.interpolate(loc_logits, size=(target_height, target_width), mode='bilinear', align_corners=False)
             self.cams =  resized_logits
-            return cl_logits
-        else:
-            return cl_logits
+            
+        return cl_logits
 
     def __str__(self):
         return "{}. Task: {}.".format(self.name, self.task)
