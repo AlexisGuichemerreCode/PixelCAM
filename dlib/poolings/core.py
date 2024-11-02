@@ -351,8 +351,8 @@ class PixelWise(_BasicPooler):
         #logits = x
         #logits = x
         logits = self.conv4(x)
-        if return_cams:
-            self.cams = logits
+        # if return_cams:
+        #     self.cams = logits
         return logits
     
 
