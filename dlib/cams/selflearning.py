@@ -310,7 +310,7 @@ class MBSeederSLFCAMS(nn.Module):
         opx = _STOneSample(min_=self.min_, max_=self.max_, nbr_bg=nbr_bg, neg_samples_partial=False)
 
         if self.neg_samples_partial:
-            self_all_bg = int(h * w)
+            self_all_bg = float(h * w)
             opx_neg = _STOneSample(min_= self.min_, max_=self.max_, nbr_bg=self_all_bg, neg_samples_partial=self.neg_samples_partial)
         
         for i in range(b):
@@ -458,7 +458,7 @@ class _ProbaOneSample(nn.Module):
 
 
 class _ProbaAreaOneSample(nn.Module):
-    def __init__(self, min_: int, max_: int, min_p: float):
+    def __init__(self, min_: int, max_: int, min_p: float, neg_samples_partial: bool = False):
         super(_ProbaAreaOneSample, self).__init__()
 
         assert isinstance(min_, int)
@@ -475,6 +475,7 @@ class _ProbaAreaOneSample(nn.Module):
         self.min_ = min_
         self.max_ = max_
         self.min_p = min_p
+        self.neg_samples_partial = neg_samples_partial
 
         self.fg_capture = _ProbaSampler(nbr=max_, trg=_FG)
         self.bg_capture = _ProbaAreaSampler(nbr=min_, p=min_p, trg=_BG)
@@ -484,6 +485,10 @@ class _ProbaAreaOneSample(nn.Module):
         assert cam.ndim == 2
 
         # cam: h, w
+
+        if self.neg_samples_partial:
+            bg = self.bg_capture(cam=cam)
+            return bg
 
         fg = self.fg_capture(cam=cam)
         bg = self.bg_capture(cam=cam)
@@ -621,7 +626,8 @@ class MBProbNegAreaSeederSLFCAMS(nn.Module):
                  max_: int = 1,
                  min_p: float = .2,
                  ksz: int = 3,
-                 seg_ignore_idx: int = -255
+                 seg_ignore_idx: int = -255,
+                 neg_samples_partial: bool = False
                  ):
         """
         Sample seeds from CAM.
@@ -668,6 +674,8 @@ class MBProbNegAreaSeederSLFCAMS(nn.Module):
 
         self.min_p = min_p
 
+        self.neg_samples_partial = neg_samples_partial
+
         self.ignore_idx = seg_ignore_idx
 
     def mb_dilate(self, x):
@@ -688,7 +696,7 @@ class MBProbNegAreaSeederSLFCAMS(nn.Module):
     def identity(self, x):
         return x
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, class_idx = None) -> torch.Tensor:
         """
         :param x: torch.Tensor. average cam: batchs, 1, h, w. Detach it first.
         :return: pseudo labels. batchsize, h, w
@@ -721,8 +729,19 @@ class MBProbNegAreaSeederSLFCAMS(nn.Module):
         opx = _ProbaAreaOneSample(min_=self.min_, max_=self.max_,
                                   min_p=self.min_p)
 
+        # for i in range(b):
+        #     all_fg[i], all_bg[i] = opx(cam=x[i].squeeze())
+
+        if self.neg_samples_partial:
+            self_all_bg = 1.0
+            opx_neg = _ProbaAreaOneSample(min_= self.min_, max_=self.max_, min_p=self_all_bg, neg_samples_partial=self.neg_samples_partial)
+        
         for i in range(b):
-            all_fg[i], all_bg[i] = opx(cam=x[i].squeeze())
+            if self.neg_samples_partial and class_idx[i] == 0:
+                all_bg[i] = opx_neg(cam=x[i].squeeze())
+            else:
+                all_fg[i], all_bg[i] = opx(cam=x[i].squeeze())
+            
 
         # fg
         all_fg = dilate(all_fg.unsqueeze(1)).squeeze(1)
@@ -981,6 +1000,17 @@ class MBProbSeederSLNEGEV(MBProbSeederSLFCAMS):
 
 
 class MBProbNegAreaSeederSLNEGEV(MBProbNegAreaSeederSLFCAMS):
+    pass
+
+class MBSeederSLPCAM(MBSeederSLFCAMS):
+    pass
+
+
+class MBProbSeederSLPCAM(MBProbSeederSLFCAMS):
+    pass
+
+
+class MBProbNegAreaSeederSLPCAM(MBProbNegAreaSeederSLFCAMS):
     pass
 
 

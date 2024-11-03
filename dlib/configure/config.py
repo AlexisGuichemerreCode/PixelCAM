@@ -381,6 +381,7 @@ def get_config(ds: str, fold: int, magnification: str) -> dict:
         "pixel_wise_classification": False,  # Add this parameter to control the creation of the second head for localization for Energy Model
         "path_cam": None,  # path_cam for CAM for Energy Model
         "neg_samples_partial": False,  # use or not negative samples partial pixel-wise. allowed only
+        "sl_pc_seeder": constants.SEED_PROB,  # type of seeder.
         "ece": False,  # use or not ECE.
         "ece_lambda": 1.,  # lambda for ECE.
 

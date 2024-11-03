@@ -402,7 +402,9 @@ class Trainer(Basic):
                     seg_ignore_idx=args.seg_ignore_idx)
         
         elif self.args.pixel_wise_classification:
-            return selflearning.MBSeederSLFCAMS(
+
+            if args.sl_pc_seeder == constants.SEED_TH:
+                return selflearning.MBSeederSLPCAM(
                     min_=args.sl_min,
                     max_=args.sl_max,
                     ksz=args.sl_ksz,
@@ -413,6 +415,36 @@ class Trainer(Basic):
                     multi_label_flag=args.multi_label_flag,
                     seg_ignore_idx=args.seg_ignore_idx,
                     neg_samples_partial=args.neg_samples_partial)
+
+            elif args.sl_pc_seeder == constants.SEED_PROB:
+                return selflearning.MBProbSeederSLPCAM(
+                    min_=args.sl_min,
+                    max_=args.sl_max,
+                    ksz=args.sl_ksz,
+                    seg_ignore_idx=args.seg_ignore_idx
+                )
+            elif args.sl_pc_seeder == constants.SEED_PROB_N_AREA:
+                return selflearning.MBProbNegAreaSeederSLPCAM(
+                    min_=args.sl_min,
+                    max_=args.sl_max,
+                    min_p=args.sl_ng_min_p,
+                    ksz=args.sl_ksz,
+                    seg_ignore_idx=args.seg_ignore_idx,
+                    neg_samples_partial=args.neg_samples_partial
+                )
+            else:
+                raise NotImplementedError
+            # return selflearning.MBSeederSLFCAMS(
+            #         min_=args.sl_min,
+            #         max_=args.sl_max,
+            #         ksz=args.sl_ksz,
+            #         min_p=args.sl_min_p,
+            #         fg_erode_k=args.sl_fg_erode_k,
+            #         fg_erode_iter=args.sl_fg_erode_iter,
+            #         support_background=args.model['support_background'],
+            #         multi_label_flag=args.multi_label_flag,
+            #         seg_ignore_idx=args.seg_ignore_idx,
+            #         neg_samples_partial=args.neg_samples_partial)
 
         elif args.task == constants.NEGEV:
 

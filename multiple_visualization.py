@@ -544,7 +544,7 @@ def fast_eval():
         #os.makedirs(out_dir, exist_ok=True)
 
         #plt.savefig(os.path.join(out_dir, f'vis_{method_name_lst[0]}_{checkpoint_type}_target_ds_{parsedargs.target_dataset}_with_source_best_cl_{parsedargs.draw_vis_with_best_source_classifier}.png'))
-        plt.savefig(os.path.join(out_dir, 'normal.png'))
+        plt.savefig(os.path.join(out_dir, 'cancer.png'))
         # overlay_images = get_visaualization(exp_path=parsedargs.path_pre_trained_source, checkpoint_type=checkpoint_type, dataset=parsedargs.target_dataset, cudaid=parsedargs.cudaid, image_ids_to_draw=parsedargs.image_ids_to_draw, split='test', tmp_outd='tmp_outd')
         # overlay_images = get_visaualization(exp_path=parsedargs.target_domain_exp_path['SFDE'], checkpoint_type=checkpoint_type, dataset=parsedargs.target_dataset, cudaid=parsedargs.cudaid, image_ids_to_draw=parsedargs.image_ids_to_draw, split='test', tmp_outd='tmp_outd')
         # overlay_images = get_visaualization(exp_path=parsedargs.target_domain_exp_path['SHOT'], checkpoint_type=checkpoint_type, dataset=parsedargs.target_dataset, cudaid=parsedargs.cudaid, image_ids_to_draw=parsedargs.image_ids_to_draw, split='test', tmp_outd='tmp_outd')

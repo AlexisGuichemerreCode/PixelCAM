@@ -1,10 +1,10 @@
-DLLL 2024-10-30 13:07:45.318955 0:00:00.667442 
+DLLL 2024-11-02 22:33:27.623453 0:00:01.115332 
 =================================================================================================
  TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: CAMELYON512 	 METHOD: DEEPMIL 	 ENCODER: RESNET50 	
 =================================================================================================
 
-DLLL 2024-10-30 13:07:48.298058 0:00:03.646545 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 24036932
-DLLL 2024-10-30 13:07:48.298550 0:00:03.647037 Arch: STDClassifier
+DLLL 2024-11-02 22:33:28.662948 0:00:02.154827 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 24036932
+DLLL 2024-11-02 22:33:28.663128 0:00:02.155007 Arch: STDClassifier
 task: STD_CL
 encoder_name: resnet50
 encoder_weights: imagenet
@@ -27,24 +27,24 @@ freeze_cl: False
 im_rec: False
 img_range: tanh 
 
-DLLL 2024-10-30 13:07:48.308365 0:00:03.656852 u-resnet50. Task: STD_CL. 
+DLLL 2024-11-02 22:33:28.667298 0:00:02.159177 u-resnet50. Task: STD_CL. 
  NBR-PARAMS: 
 	Encoder [resnet50]: 23508032. 
 	Classification head [DeepMIL]: 528900. 
 	Total: 24036932. 
 
-DLLL 2024-10-30 13:07:50.247834 0:00:05.596321 
+DLLL 2024-11-02 22:33:28.767112 0:00:02.258991 
 ========================================================================================================================
  MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/MODEL_CVPR_2025/CAMELYON512/BLOC/ID_SOURCE_12_CAMELYON512_DEEPMIL_5-TSK_STD_CL-DS_CAMELYON512-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_DEEPMIL-SPOOLING_DEEPMIL-ARCH_STDCLASSIFIER-ECD_RESNET50/CAMELYON512-0-RESNET50-DEEPMIL-DEEPMIL-CP_BEST_LOCALIZATION
 ========================================================================================================================
 
-DLLL 2024-10-30 13:10:38.750586 0:02:54.099073 
+DLLL 2024-11-02 22:34:55.798317 0:01:29.290196 
 ===================================================================================================
  TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: CAMELYON512 	 METHOD: ENERGYCAM 	 ENCODER: RESNET50 	
 ===================================================================================================
 
-DLLL 2024-10-30 13:10:41.152340 0:02:56.500827 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 26272581
-DLLL 2024-10-30 13:10:41.152948 0:02:56.501435 Arch: STDClassifier
+DLLL 2024-11-02 22:34:56.379968 0:01:29.871847 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 26270532
+DLLL 2024-11-02 22:34:56.380071 0:01:29.871950 Arch: STDClassifier
 task: STD_CL
 encoder_name: resnet50
 encoder_weights: imagenet
@@ -56,7 +56,7 @@ aux_params:
 	kmin: 0.1
 	alpha: 0.6
 	dropout: 0.0
-	support_background: True
+	support_background: False
 	r: 10.0
 	mid_channels: 128
 	gated: False
@@ -67,15 +67,15 @@ freeze_cl: False
 im_rec: False
 img_range: tanh 
 
-DLLL 2024-10-30 13:10:41.160291 0:02:56.508778 u-resnet50. Task: STD_CL. 
+DLLL 2024-11-02 22:34:56.383437 0:01:29.875316 u-resnet50. Task: STD_CL. 
  NBR-PARAMS: 
 	Encoder [resnet50]: 23508032. 
-	Classification head [WGAP]: 6147. 
+	Classification head [WGAP]: 4098. 
 	Pixel Wise Classification head [PixelWise]: 2758402. 
-	Total: 26272581. 
+	Total: 26270532. 
 
-DLLL 2024-10-30 13:10:46.527074 0:03:01.875561 
+DLLL 2024-11-02 22:34:56.492547 0:01:29.984426 
 ========================================================================================================================
- MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/MODEL_CVPR_2025/CAMELYON512/BLOC/ID_SOURCE_2_MAX100_CAMELYON512_ENERGYCAM_DEEPMIL_2_LOC-TSK_STD_CL-DS_CAMELYON512-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_ENERGYCAM-SPOOLING_WGAP-ARCH_STDCLASSIFIER-ECD_RESNET50/CAMELYON512-0-RESNET50-ENERGYCAM-WGAP-CP_BEST_LOCALIZATION
+ MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/MODEL_CVPR_2025/CAMELYON512/BLOC/ID_ENERGY_CAM_CAMELYON_DEEPMIL_TEST_11-TSK_STD_CL-DS_CAMELYON512-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_ENERGYCAM-SPOOLING_WGAP-ARCH_STDCLASSIFIER-ECD_RESNET50/CAMELYON512-0-RESNET50-ENERGYCAM-WGAP-CP_BEST_LOCALIZATION
 ========================================================================================================================
 

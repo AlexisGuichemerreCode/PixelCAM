@@ -585,8 +585,7 @@ class EnergyCAM:
         # Compute CAM: (h, w)
         #predicted_class = scores.argmax(dim=1)
         #self.predicted_class = predicted_class
-        self.predicted_class = class_idx
-        cam = self.compute_cams(argmax=argmax)
+        cam = self.compute_cams(class_idx=class_idx, argmax=argmax)
         # if reshape is not None:
         #     assert len(reshape) == 2
         #     cam = F.interpolate(cam.unsqueeze(0).unsqueeze(0),
@@ -595,7 +594,7 @@ class EnergyCAM:
         #                         align_corners=False).squeeze(0).squeeze(0)
         return cam
 
-    def compute_cams(self, argmax: bool = False) -> Tensor:
+    def compute_cams(self, class_idx: int, argmax: bool = False, ) -> Tensor:
         """Compute the CAM for a specific output class
 
         Args:
@@ -615,10 +614,10 @@ class EnergyCAM:
         assert cams.shape[0] == 1
         assert cams.shape[1] == 2
 
-        if self.dataset == constants.GLAS:
-            idx = 1
+        if self.dataset == constants.CAMELYON512:
+            idx = class_idx
         else:
-            idx = self.predicted_class
+            idx = 1
             
         if argmax:
             cam = torch.argmax(cams, dim=1).squeeze(0).float()  # (h, w)

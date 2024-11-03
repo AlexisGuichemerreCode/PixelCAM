@@ -497,6 +497,8 @@ def get_args(args: dict, eval: bool = False):
 
     parser.add_argument('--neg_samples_partial', type=str2bool, default=None,
                         help='use or not negative samples partial pixel-wise')
+    parser.add_argument('--sl_pc_seeder', type=str, default=None,
+                        help='PCAM: self-learning: seeder type.')
 
     parser.add_argument('--ece', type=str2bool, default=None)
     parser.add_argument('--ece_lambda', type=float, default=None, 
