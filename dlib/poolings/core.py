@@ -321,15 +321,17 @@ class PixelWise(_BasicPooler):
         mid_features1 = self.in_channels // 2
         mid_features2 = mid_features1 // 2
         mid_features3 = mid_features2 // 2
-        
-        self.layer1 = self._make_layer(self.in_channels, mid_features1)
-        self.layer2 = self._make_layer(mid_features1, mid_features2)
-        self.layer3 = self._make_layer(mid_features2, mid_features3)
+
+        self.upsample = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=False)
+        self.layer1 = self._make_layer(self.in_channels, mid_features3)
+        #self.layer2 = self._make_layer(mid_features1, mid_features2)
+        #self.layer3 = self._make_layer(mid_features2, mid_features3)
         self.conv4 = nn.Conv2d(mid_features3, classes, kernel_size=1)
+
 
     def _make_layer(self, in_channels, out_channels):
         return nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, kernel_size=1),
+            nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1),
             nn.BatchNorm2d(out_channels),
             nn.ReLU()
         )
@@ -345,9 +347,10 @@ class PixelWise(_BasicPooler):
         #out1 = self.relu1(self.bn1(self.conv1(x)))
         #out2 = self.relu2(self.bn2(self.conv2(out1)))
         #out3 = self.relu3(self.bn3(self.conv3(out2)))
+        x = self.upsample(x)
         x = self.layer1(x)
-        x = self.layer2(x)
-        x = self.layer3(x)
+        #x = self.layer2(x)
+        #x = self.layer3(x)
         #logits = x
         #logits = x
         logits = self.conv4(x)
