@@ -310,7 +310,7 @@ class MBSeederSLFCAMS(nn.Module):
         opx = _STOneSample(min_=self.min_, max_=self.max_, nbr_bg=nbr_bg, neg_samples_partial=False)
 
         if self.neg_samples_partial:
-            self_all_bg = float(h * w)
+            self_all_bg = int(h * w)
             opx_neg = _STOneSample(min_= self.min_, max_=self.max_, nbr_bg=self_all_bg, neg_samples_partial=self.neg_samples_partial)
         
         for i in range(b):
