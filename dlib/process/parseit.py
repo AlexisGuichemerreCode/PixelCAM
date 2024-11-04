@@ -989,7 +989,8 @@ def get_args(args: dict, eval: bool = False):
 
                 #     assert os.path.isdir(join(slurm_dir, tag))
                 #     args['std_cams_folder'][split] = join(slurm_dir, tag)
-                args['std_cams_folder'][split] = "{}/datasets/wsol-done-right/resnet50-gradcampp-bloc-glas_cams_{}".format(os.environ["SLURM_TMPDIR"], split.lower())
+                #args['std_cams_folder'][split] = "{}/datasets/wsol-done-right/resnet50-gradcampp-bloc-glas_cams_{}".format(os.environ["SLURM_TMPDIR"], split.lower())
+                args['std_cams_folder'][split] = "{}/datasets/wsol-done-right/{}".format(os.environ["SLURM_TMPDIR"], tag)
 
             else:
                 path_cams = join(root_dir, constants.DATA_CAMS, tag)
