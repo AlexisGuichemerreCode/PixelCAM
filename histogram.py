@@ -382,6 +382,35 @@ def get_visaualization(exp_path, target_method, sf_uda_source_folder, checkpoint
             multi_contour_eval=args.multi_contour_eval,
             out_folder=args.outd,
         )
+    
+    hist_0 = CAMComputer(
+            args=deepcopy(args),
+            model=model,
+            loader=loaders[split],
+            metadata_root=os.path.join(metadata_root, split),
+            mask_root=args.mask_root,
+            iou_threshold_list=args.iou_threshold_list,
+            dataset_name=args.dataset,
+            split=split,
+            cam_curve_interval=args.cam_curve_interval,
+            multi_contour_eval=args.multi_contour_eval,
+            out_folder=args.outd,
+        )
+
+    hist_1 = CAMComputer(
+            args=deepcopy(args),
+            model=model,
+            loader=loaders[split],
+            metadata_root=os.path.join(metadata_root, split),
+            mask_root=args.mask_root,
+            iou_threshold_list=args.iou_threshold_list,
+            dataset_name=args.dataset,
+            split=split,
+            cam_curve_interval=args.cam_curve_interval,
+            multi_contour_eval=args.multi_contour_eval,
+            out_folder=args.outd,
+        )
+    
     overlay_images = {}
     input_images = {}
     gt_masks = {}
@@ -393,8 +422,9 @@ def get_visaualization(exp_path, target_method, sf_uda_source_folder, checkpoint
         targets = targets.to(device)
 
         for image, target, image_id in zip(images, targets, image_ids):
-            if image_id not in image_ids_to_draw:
-                continue
+            # if image_id not in image_ids_to_draw:
+            #     continue
+
             with torch.set_grad_enabled(cam_computer.req_grad):
                 cam, cl_logits = cam_computer.get_cam_one_sample(
                     image=image.unsqueeze(0), target=target.item())
@@ -407,28 +437,61 @@ def get_visaualization(exp_path, target_method, sf_uda_source_folder, checkpoint
                                     mode='bilinear',
                                     align_corners=False).squeeze(0).squeeze(0)
                 cam = cam.detach()
-                image_norm = image.permute(1,2,0)
-                image_norm = (image_norm - image_norm.min()) / (image_norm.max() - image_norm.min())
-                overlay_image = show_cam_on_image(t2n(image_norm), t2n(cam), use_rgb=True)
-                overlay_images[image_id] = overlay_image
-                input_images[image_id] = t2n(image_norm)
+                # image_norm = image.permute(1,2,0)
+                # image_norm = (image_norm - image_norm.min()) / (image_norm.max() - image_norm.min())
+                # overlay_image = show_cam_on_image(t2n(image_norm), t2n(cam), use_rgb=True)
+                # overlay_images[image_id] = overlay_image
+                # input_images[image_id] = t2n(image_norm)
 
                 scoremap = t2n(cam)
-                cam_computer.evaluator.accumulate(scoremap, image_id, target=target, preds_ordered=None)
+                if target == 0:
+                    hist_0.evaluator.accumulate(scoremap, image_id, target=target, preds_ordered=None)
+                else:
+                    hist_1.evaluator.accumulate(scoremap, image_id, target=target, preds_ordered=None)
 
                 # gt_mask = get_mask('f/export/livia/home/vision/Aguichemerre/datasets/{dataset}',
                 #            cam_computer.evaluator.mask_paths[image_id],
                 #            cam_computer.evaluator.ignore_paths[image_id])
-                if target == 1:
-                    gt_annotation =  Image.open(os.path.join(f'/export/gauss/vision/Aguichemerre/datasets/{dataset}', cam_computer.evaluator.mask_paths[image_id][0]))
-                    gt_annotation = gt_annotation.resize(image_size)
-                    gt_annotation=np.asarray(gt_annotation)
-                    gt_annotation = (gt_annotation > 0).astype(np.uint8)
-                    gt_masks[image_id]=np.asarray(gt_annotation)
-                else:
-                    gt_masks[image_id] = np.zeros(image_size, dtype=np.uint8)
+                # if target == 1:
+                #     gt_annotation =  Image.open(os.path.join(f'/export/gauss/vision/Aguichemerre/datasets/{dataset}', cam_computer.evaluator.mask_paths[image_id][0]))
+                #     gt_annotation = gt_annotation.resize(image_size)
+                #     gt_annotation=np.asarray(gt_annotation)
+                #     gt_annotation = (gt_annotation > 0).astype(np.uint8)
+                #     gt_masks[image_id]=np.asarray(gt_annotation)
+                # else:
+                #     gt_masks[image_id] = np.zeros(image_size, dtype=np.uint8)
 
-    return overlay_images, input_images, method_name, gt_masks
+    # Tracer et sauvegarder les histogrammes pour la classe 0
+    plt.figure()
+    plt.bar(hist_0.evaluator.threshold_list_right_edge[:-1], hist_0.evaluator.gt_true_score_hist, width=np.diff(hist_0.evaluator.threshold_list_right_edge), align='edge', edgecolor='black')
+    plt.title('GT True Score Histogram (Class 0)')
+    plt.xlabel('Threshold')
+    plt.ylabel('Frequency')
+    plt.savefig('gt_true_score_hist_class_0.png')
+
+    plt.figure()
+    plt.bar(hist_0.evaluator.threshold_list_right_edge[:-1], hist_0.evaluator.gt_false_score_hist, width=np.diff(hist_0.evaluator.threshold_list_right_edge), align='edge', edgecolor='black')
+    plt.title('GT False Score Histogram (Class 0)')
+    plt.xlabel('Threshold')
+    plt.ylabel('Frequency')
+    plt.savefig('gt_false_score_hist_class_0.png')
+
+    # Tracer et sauvegarder les histogrammes pour la classe 1
+    plt.figure()
+    plt.bar(hist_1.evaluator.threshold_list_right_edge[:-1], hist_1.evaluator.gt_true_score_hist, width=np.diff(hist_1.evaluator.threshold_list_right_edge), align='edge', edgecolor='black')
+    plt.title('GT True Score Histogram (Class 1)')
+    plt.xlabel('Threshold')
+    plt.ylabel('Frequency')
+    plt.savefig('gt_true_score_hist_class_1.png')
+
+    plt.figure()
+    plt.bar(hist_1.evaluator.threshold_list_right_edge[:-1], hist_1.evaluator.gt_false_score_hist, width=np.diff(hist_1.evaluator.threshold_list_right_edge), align='edge', edgecolor='black')
+    plt.title('GT False Score Histogram (Class 1)')
+    plt.xlabel('Threshold')
+    plt.ylabel('Frequency')
+    plt.savefig('gt_false_score_hist_class_1.png')
+
+    return cam_computer.evaluator.gt_true_score_hist, cam_computer.evaluator.gt_false_score_hist
 
 def fast_eval():
     t0 = dt.datetime.now()
@@ -493,7 +556,7 @@ def fast_eval():
         
         _CODE_FUNCTION = 'fast_eval_{}'.format(split)
 
-        target_methods = ['DeepMIL','EnergyCAM']
+        target_methods = ['EnergyCAM']
         #'CAM', 'GradCAMpp', 'NEGEV',
         # target_methods = ['ADADSA']GradCAMpp'EnergyCAM', 'NEGEV', 
         #create fig len(parsedargs.image_ids_to_draw) row and len(target_methods) columns
@@ -510,48 +573,10 @@ def fast_eval():
             #     continue
 
             exp_path = parsedargs.target_domain_exp_path[target_method]
-            overlay_images, input_images, method_name, gt_masks = get_visaualization(exp_path=exp_path, target_method=target_method, sf_uda_source_folder=parsedargs.path_pre_trained_source, checkpoint_type=checkpoint_type, dataset=parsedargs.target_dataset, cudaid=parsedargs.cudaid, image_ids_to_draw=parsedargs.image_ids_to_draw, split='test', tmp_outd='tmp_outd', parsedargs=parsedargs)
-            method_name_lst.append(method_name)
-            #add images to fig
-            for i, image_id in enumerate(parsedargs.image_ids_to_draw):
-                overlay_image = overlay_images[image_id]
-                
-                axs[i, ind_method].imshow(overlay_image)
-                if i == 0:
-                    methd_name_to_print = method_name.upper().replace('GRADCAMPP', 'GRADCAM++')
-                    axs[i, ind_method].set_title(f'{target_method}', fontsize=18)
-                axs[i, ind_method].axis('off')
-                #dhow input image in the first column
-                input_image = input_images[image_id]
-                axs[i, 0].imshow(input_image)
-                axs[i, 0].axis('off')
+            gt_true_score_hist, gt_false_score_hist = get_visaualization(exp_path=exp_path, target_method=target_method, sf_uda_source_folder=parsedargs.path_pre_trained_source, checkpoint_type=checkpoint_type, dataset=parsedargs.target_dataset, cudaid=parsedargs.cudaid, image_ids_to_draw=parsedargs.image_ids_to_draw, split='test', tmp_outd='tmp_outd', parsedargs=parsedargs)
 
-                axs[i, 1].imshow(gt_masks[image_id], cmap='gray')
-                axs[i, 1].axis('off')
-                if i == 0:
-                    axs[i, 0].set_title('INPUT\nTARGET', fontsize=18)
-                
-                if i == 0:
-                    axs[i, 1].set_title('MASK', fontsize=18)
-        #check all values are same in encoder_name_lst
-        # assert len(set(method_name_lst)) == 1
-                    
-        plt.tight_layout()
-        # fig.subplots_adjust(wspace=0.1)
-        out_dir = 'visualization'
-        os.makedirs(out_dir, exist_ok=True)
 
-        out_dir = os.path.join(out_dir, f'{checkpoint_type}')
-        os.makedirs(out_dir, exist_ok=True)
         
-        out_dir = os.path.join(out_dir, f'source_domain_{parsedargs.target_dataset}')
-        os.makedirs(out_dir, exist_ok=True)
-
-        #out_dir = os.path.join(out_dir, f'normal')
-        #os.makedirs(out_dir, exist_ok=True)
-
-        #plt.savefig(os.path.join(out_dir, f'vis_{method_name_lst[0]}_{checkpoint_type}_target_ds_{parsedargs.target_dataset}_with_source_best_cl_{parsedargs.draw_vis_with_best_source_classifier}.png'))
-        plt.savefig(os.path.join(out_dir, 'cancer_1x1_20_upscale.png'))
         # overlay_images = get_visaualization(exp_path=parsedargs.path_pre_trained_source, checkpoint_type=checkpoint_type, dataset=parsedargs.target_dataset, cudaid=parsedargs.cudaid, image_ids_to_draw=parsedargs.image_ids_to_draw, split='test', tmp_outd='tmp_outd')
         # overlay_images = get_visaualization(exp_path=parsedargs.target_domain_exp_path['SFDE'], checkpoint_type=checkpoint_type, dataset=parsedargs.target_dataset, cudaid=parsedargs.cudaid, image_ids_to_draw=parsedargs.image_ids_to_draw, split='test', tmp_outd='tmp_outd')
         # overlay_images = get_visaualization(exp_path=parsedargs.target_domain_exp_path['SHOT'], checkpoint_type=checkpoint_type, dataset=parsedargs.target_dataset, cudaid=parsedargs.cudaid, image_ids_to_draw=parsedargs.image_ids_to_draw, split='test', tmp_outd='tmp_outd')
