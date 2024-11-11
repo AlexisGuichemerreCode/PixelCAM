@@ -724,6 +724,7 @@ def get_loss_source(args):
     
     #Pixel classification
     if args.task == constants.STD_CL and args.pixel_wise_classification:
+        
         if args.ece:
             EnergyCE_loss = losses.EnergyCEloss(
                     cuda_id=args.c_cudaid,
@@ -762,6 +763,26 @@ def get_loss_source(args):
                 support_background=support_background,
                 multi_label_flag=multi_label_flag,
                 start_epoch=args.crf_start_ep, end_epoch=args.crf_end_ep,
+            ))
+
+        if args.entropy_fc:
+            masterloss.add(losses.EntropyFcams(
+                cuda_id=args.c_cudaid,
+                lambda_=args.entropy_fc_lambda,
+                support_background=support_background,
+                multi_label_flag=multi_label_flag))
+            
+        if args.max_sizepos_fc:
+            elb = ELB(init_t=args.elb_init_t, max_t=args.elb_max_t,
+                  mulcoef=args.elb_mulcoef).cuda(args.c_cudaid)
+            
+            masterloss.add(losses.MaxSizePositiveFcams(
+                cuda_id=args.c_cudaid,
+                lambda_=args.max_sizepos_fc_lambda,
+                elb=deepcopy(elb), support_background=support_background,
+                multi_label_flag=multi_label_flag,
+                start_epoch=args.max_sizepos_fc_start_ep,
+                end_epoch=args.max_sizepos_fc_end_ep
             ))
 
 

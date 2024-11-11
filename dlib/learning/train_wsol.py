@@ -668,19 +668,29 @@ class Trainer(Basic):
                     with torch.no_grad():
                         seeds = self.sl_mask_builder(cams_inter, class_idx= targets)
 
-                cl_logits = output
-            
-                loss = self.loss(epoch=self.epoch,
-                                 model=self.model,
-                                 fcams=self.model.cams,
-                                 cl_logits=cl_logits,
-                                 glabel=y_global,
-                                 pseudo_glabel=y_pl_global,
-                                 raw_img=raw_imgs,
-                                 cutmix_holder=cutmix_holder,
-                                 seeds=seeds
-                                 )
-                logits = cl_logits
+                    cl_logits = output
+                
+                    loss = self.loss(epoch=self.epoch,
+                                    model=self.model,
+                                    fcams=self.model.cams,
+                                    cl_logits=cl_logits,
+                                    glabel=y_global,
+                                    pseudo_glabel=y_pl_global,
+                                    raw_img=raw_imgs,
+                                    cutmix_holder=cutmix_holder,
+                                    seeds=seeds
+                                    )
+                    logits = cl_logits
+                else:
+                    cl_logits = output
+                    loss = self.loss(epoch=self.epoch,
+                                    model=self.model,
+                                    cl_logits=cl_logits,
+                                    glabel=y_global,
+                                    pseudo_glabel=y_pl_global,
+                                    cutmix_holder=cutmix_holder
+                                    )
+                    logits = cl_logits
 
             elif args.task == constants.F_CL:
                 cl_logits, fcams, im_recon = output
@@ -1650,6 +1660,12 @@ class Trainer(Basic):
                                      map_location=self.device)
                 self.model.classification_head.load_state_dict(
                     weights, strict=True)
+                
+                if self.args.method == constants.METHOD_ENERGY:
+                    weights = torch.load(join(path, 'pixel_wise_classification_head.pt'),
+                                     map_location=self.device)
+                    self.model.pixel_wise_classification_head.load_state_dict(
+                        weights, strict=True)   
 
         elif self.args.task in [constants.F_CL, constants.NEGEV]:
 
