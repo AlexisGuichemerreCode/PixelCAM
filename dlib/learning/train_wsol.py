@@ -430,7 +430,8 @@ class Trainer(Basic):
                     min_p=args.sl_ng_min_p,
                     ksz=args.sl_ksz,
                     seg_ignore_idx=args.seg_ignore_idx,
-                    neg_samples_partial=args.neg_samples_partial
+                    neg_samples_partial=args.neg_samples_partial,
+                    equalize=args.sl_pc_equalize
                 )
             else:
                 raise NotImplementedError

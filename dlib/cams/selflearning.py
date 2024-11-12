@@ -627,7 +627,8 @@ class MBProbNegAreaSeederSLFCAMS(nn.Module):
                  min_p: float = .2,
                  ksz: int = 3,
                  seg_ignore_idx: int = -255,
-                 neg_samples_partial: bool = False
+                 neg_samples_partial: bool = False,
+                 equalize: bool = False
                  ):
         """
         Sample seeds from CAM.
@@ -675,6 +676,14 @@ class MBProbNegAreaSeederSLFCAMS(nn.Module):
         self.min_p = min_p
 
         self.neg_samples_partial = neg_samples_partial
+        self.equalize = equalize
+
+        if self.neg_samples_partial:
+            self.all_bg_ = 1.0
+        if self.equalize:
+            self.min_bg_= self.max_-self.min_
+        else:
+            self.min_bg_= self.min_
 
         self.ignore_idx = seg_ignore_idx
 
@@ -732,9 +741,9 @@ class MBProbNegAreaSeederSLFCAMS(nn.Module):
         # for i in range(b):
         #     all_fg[i], all_bg[i] = opx(cam=x[i].squeeze())
 
+        
         if self.neg_samples_partial:
-            self_all_bg = 1.0
-            opx_neg = _ProbaAreaOneSample(min_= self.min_, max_=self.max_, min_p=self_all_bg, neg_samples_partial=self.neg_samples_partial)
+            opx_neg = _ProbaAreaOneSample(min_= self.min_bg_, max_=self.max_, min_p=self.all_bg_, neg_samples_partial=self.neg_samples_partial)
         
         for i in range(b):
             if self.neg_samples_partial and class_idx[i] == 0:

@@ -382,6 +382,7 @@ def get_config(ds: str, fold: int, magnification: str) -> dict:
         "path_cam": None,  # path_cam for CAM for Energy Model
         "neg_samples_partial": False,  # use or not negative samples partial pixel-wise. allowed only
         "sl_pc_seeder": constants.SEED_PROB,  # type of seeder.
+        "sl_pc_equalize": False,  # use or not equalize the number of positive and negative samples.
         "ece": False,  # use or not ECE.
         "ece_lambda": 1.,  # lambda for ECE.
 

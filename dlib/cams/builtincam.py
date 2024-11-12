@@ -615,7 +615,8 @@ class EnergyCAM:
         assert cams.shape[1] == 2
 
         if self.dataset == constants.CAMELYON512:
-            idx = class_idx
+            #idx = class_idx
+            idx = 1
         else:
             idx = 1
             
