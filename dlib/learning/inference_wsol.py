@@ -201,7 +201,7 @@ class CAMComputer(object):
 
         if self.args.task == constants.STD_CL:
 
-            if self.args.pixel_wise_classification:
+            if self.args.method == constants.METHOD_ENERGY:
                 cl_logits = output
                 cam = self.std_cam_extractor(
                                          class_idx=target,

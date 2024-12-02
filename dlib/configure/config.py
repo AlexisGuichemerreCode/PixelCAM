@@ -518,6 +518,11 @@ def get_config(ds: str, fold: int, magnification: str) -> dict:
         # target wsol method is specified in main, above. using method,
         # spatial_pooling, dataset, fold, encoder_name.
 
+        'target_domain_ds_to_compute_stats': None, #Name of the target domain dataset to compute the stats
+        'ds_to_compute_acc_trainset_source_target' : None, #Compute the accuracy on the source and target test set
+        'mask_root_target': get_root_wsol_dataset(),  # path to masks target.
+
+
         # SFUDA methods ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         # ======================================================================
         #                               SHOT
@@ -656,6 +661,10 @@ def get_config(ds: str, fold: int, magnification: str) -> dict:
         # https://arxiv.org/abs/2002.08546.
         'sfde': False,  # SFDE method. ON/OFF.
         'sfde_threshold': 1.0, # lambda of this term. >= 0.
+        #                       DISTRIBUTION ESTIMATION
+        # ======================================================================
+        # ESFDA: "Energy Source-Free Domain Adaptation",
+        'esfda': False,  # ESFDE method. ON/OFF.
         # ======================================================================
         #                     END - DISTRIBUTION ESTIMATION
         # ======================================================================
@@ -824,7 +833,9 @@ def get_config(ds: str, fold: int, magnification: str) -> dict:
         args['metadata_root'] = join(args['metadata_root'], args['dataset'],
                                      f"fold-{args['fold']}")
 
+    
     args['mask_root'] = join(args['mask_root'], dsname)
+    
 
     data_cams = join(root_dir, constants.DATA_CAMS)
     if not os.path.isdir(data_cams):

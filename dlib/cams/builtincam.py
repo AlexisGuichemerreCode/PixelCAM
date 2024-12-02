@@ -613,17 +613,11 @@ class EnergyCAM:
         assert cams.ndim == 4
         assert cams.shape[0] == 1
         assert cams.shape[1] == 2
-
-        if self.dataset == constants.CAMELYON512:
-            #idx = class_idx
-            idx = 1
-        else:
-            idx = 1
             
         if argmax:
             cam = torch.argmax(cams, dim=1).squeeze(0).float()  # (h, w)
         else:
-            cam = torch.softmax(cams, dim=1)[:, idx, :, :].squeeze(0)  # (h, w)
+            cam = torch.softmax(cams, dim=1)[:, 1, :, :].squeeze(0)  # (h, w)
 
         return cam
 

@@ -26,6 +26,7 @@ from torch.cuda.amp import autocast
 
 import matplotlib.pyplot as plt
 
+
 # root_dir = dirname(dirname(dirname(abspath(__file__))))
 root_dir = dirname(abspath(__file__))
 sys.path.append(root_dir)
@@ -312,7 +313,7 @@ def get_visaualization(exp_path, target_method, sf_uda_source_folder, checkpoint
     model.eval()
 
     # basic_config = config.get_config(ds=args.dataset, fold=args.fold, magnification=args.magnification)
-    basic_config = config.get_config(ds=constants.CAMELYON512, fold=args.fold, magnification=args.magnification)
+    basic_config = config.get_config(ds=constants.GLAS, fold=args.fold, magnification=args.magnification)
 
     args.data_paths = basic_config['data_paths']
     args.metadata_root = basic_config['metadata_root']
@@ -463,33 +464,33 @@ def get_visaualization(exp_path, target_method, sf_uda_source_folder, checkpoint
 
     # Tracer et sauvegarder les histogrammes pour la classe 0
     plt.figure()
-    plt.bar(hist_0.evaluator.threshold_list_right_edge[:-1], hist_0.evaluator.gt_true_score_hist, width=np.diff(hist_0.evaluator.threshold_list_right_edge), align='edge', edgecolor='black')
-    plt.title('GT True Score Histogram (Class 0)')
-    plt.xlabel('Threshold')
+    plt.bar(hist_0.evaluator.threshold_list_right_edge[:-3], hist_0.evaluator.gt_true_score_hist[:-2], width=np.diff(hist_0.evaluator.threshold_list_right_edge)[:-2], align='edge', edgecolor='black')
+    plt.title('GT True Score Histogram (Class Normal)')
+    plt.xlabel('Probability')
     plt.ylabel('Frequency')
-    plt.savefig('gt_true_score_hist_class_0.png')
+    plt.savefig('visualization/gt_true_score_hist_class_normal_GLAS.png')
 
     plt.figure()
-    plt.bar(hist_0.evaluator.threshold_list_right_edge[:-1], hist_0.evaluator.gt_false_score_hist, width=np.diff(hist_0.evaluator.threshold_list_right_edge), align='edge', edgecolor='black')
-    plt.title('GT False Score Histogram (Class 0)')
-    plt.xlabel('Threshold')
+    plt.bar(hist_0.evaluator.threshold_list_right_edge[:-3], hist_0.evaluator.gt_false_score_hist[:-2], width=np.diff(hist_0.evaluator.threshold_list_right_edge)[:-2], align='edge', edgecolor='black')
+    plt.title('GT False Score Histogram (Class Normal)')
+    plt.xlabel('Probability')
     plt.ylabel('Frequency')
-    plt.savefig('gt_false_score_hist_class_0.png')
+    plt.savefig('visualization/gt_false_score_hist_class_normal_GLAS.png')
 
     # Tracer et sauvegarder les histogrammes pour la classe 1
     plt.figure()
-    plt.bar(hist_1.evaluator.threshold_list_right_edge[:-1], hist_1.evaluator.gt_true_score_hist, width=np.diff(hist_1.evaluator.threshold_list_right_edge), align='edge', edgecolor='black')
-    plt.title('GT True Score Histogram (Class 1)')
-    plt.xlabel('Threshold')
+    plt.bar(hist_1.evaluator.threshold_list_right_edge[:-3], hist_1.evaluator.gt_true_score_hist[:-2], width=np.diff(hist_1.evaluator.threshold_list_right_edge)[:-2], align='edge', edgecolor='black')
+    plt.title('GT True Score Histogram (Class Cancer)')
+    plt.xlabel('Probability')
     plt.ylabel('Frequency')
-    plt.savefig('gt_true_score_hist_class_1.png')
+    plt.savefig('visualization/gt_true_score_hist_class_cancer_GLAS.png')
 
     plt.figure()
-    plt.bar(hist_1.evaluator.threshold_list_right_edge[:-1], hist_1.evaluator.gt_false_score_hist, width=np.diff(hist_1.evaluator.threshold_list_right_edge), align='edge', edgecolor='black')
-    plt.title('GT False Score Histogram (Class 1)')
-    plt.xlabel('Threshold')
+    plt.bar(hist_1.evaluator.threshold_list_right_edge[:-3], hist_1.evaluator.gt_false_score_hist[:-2], width=np.diff(hist_1.evaluator.threshold_list_right_edge)[:-2], align='edge', edgecolor='black')
+    plt.title('GT False Score Histogram (Class Cancer)')
+    plt.xlabel('Probability')
     plt.ylabel('Frequency')
-    plt.savefig('gt_false_score_hist_class_1.png')
+    plt.savefig('visualization/gt_false_score_hist_class_cancer_GLAS.png')
 
     return cam_computer.evaluator.gt_true_score_hist, cam_computer.evaluator.gt_false_score_hist
 

@@ -312,7 +312,7 @@ def get_visaualization(exp_path, target_method, sf_uda_source_folder, checkpoint
     model.eval()
 
     # basic_config = config.get_config(ds=args.dataset, fold=args.fold, magnification=args.magnification)
-    basic_config = config.get_config(ds=constants.CAMELYON512, fold=args.fold, magnification=args.magnification)
+    basic_config = config.get_config(ds=constants.GLAS, fold=args.fold, magnification=args.magnification)
 
     args.data_paths = basic_config['data_paths']
     args.metadata_root = basic_config['metadata_root']
@@ -322,7 +322,7 @@ def get_visaualization(exp_path, target_method, sf_uda_source_folder, checkpoint
     ####################################################################################
     ###############load performance log file from orignal exp checkpoint ###############
     ####################################################################################
-    assert split == constants.TESTSET or split == constants.VALIDSET
+    assert split == constants.TESTSET or split == constants.VALIDSET or split == constants.TRAINSET
     #split == constants.VALIDSET
     #split = constants.VALIDSET
     log_file_path_best_loc = os.path.join(exp_path, f'performance_log_{checkpoint_type}.pickle')
@@ -357,7 +357,7 @@ def get_visaualization(exp_path, target_method, sf_uda_source_folder, checkpoint
             num_val_sample_per_class=args.num_val_sample_per_class,
             std_cams_folder=args.std_cams_folder,
             # distributed_eval=False,
-            get_splits_eval=[constants.TESTSET],
+            get_splits_eval=['train'],
             eval_batch_size = 256#args.eval_batch_size,
         )
     
@@ -372,12 +372,12 @@ def get_visaualization(exp_path, target_method, sf_uda_source_folder, checkpoint
     cam_computer = CAMComputer(
             args=deepcopy(args),
             model=model,
-            loader=loaders[split],
-            metadata_root=os.path.join(metadata_root, split),
+            loader=loaders['train'],
+            metadata_root=os.path.join(metadata_root, 'train'),
             mask_root=args.mask_root,
             iou_threshold_list=args.iou_threshold_list,
             dataset_name=args.dataset,
-            split=split,
+            split='train',
             cam_curve_interval=args.cam_curve_interval,
             multi_contour_eval=args.multi_contour_eval,
             out_folder=args.outd,
@@ -386,8 +386,8 @@ def get_visaualization(exp_path, target_method, sf_uda_source_folder, checkpoint
     input_images = {}
     gt_masks = {}
     for batch_idx, (images, targets, _, image_ids, _, _, _, _) in tqdm(
-        enumerate(loaders[split]), ncols=constants.NCOLS,
-        total=len(loaders[split])):
+        enumerate(loaders['train']), ncols=constants.NCOLS,
+        total=len(loaders['train'])):
         image_size = images.shape[2:]
         images = images.to(device)
         targets = targets.to(device)
@@ -477,7 +477,7 @@ def fast_eval():
     DLLogger.init_arb(backends=log_backends, master_pid=os.getpid())
     ##########
 
-    base_checkpoint_types = [constants.BEST_LOC]
+    base_checkpoint_types = [constants.BEST_CL]
         
     for checkpoint_type_extended in base_checkpoint_types:
         checkpoint_type = checkpoint_type_extended
@@ -493,11 +493,11 @@ def fast_eval():
         
         _CODE_FUNCTION = 'fast_eval_{}'.format(split)
 
-        target_methods = ['DeepMIL','EnergyCAM']
+        target_methods = ['EnergyCAM']
         #'CAM', 'GradCAMpp', 'NEGEV',
         # target_methods = ['ADADSA']GradCAMpp'EnergyCAM', 'NEGEV', 
         #create fig len(parsedargs.image_ids_to_draw) row and len(target_methods) columns
-        fig, axs = plt.subplots(len(parsedargs.image_ids_to_draw), len(target_methods)+2, figsize=((len(target_methods)+2)*1.9, 2*len(parsedargs.image_ids_to_draw)))
+        fig, axs = plt.subplots(len(parsedargs.image_ids_to_draw), len(target_methods)+2, figsize=((len(target_methods)+2)*1.9, 2*len(parsedargs.image_ids_to_draw)),squeeze=False)
 
         method_name_lst = []
         for ind_method, target_method in enumerate(target_methods):
@@ -551,7 +551,7 @@ def fast_eval():
         #os.makedirs(out_dir, exist_ok=True)
 
         #plt.savefig(os.path.join(out_dir, f'vis_{method_name_lst[0]}_{checkpoint_type}_target_ds_{parsedargs.target_dataset}_with_source_best_cl_{parsedargs.draw_vis_with_best_source_classifier}.png'))
-        plt.savefig(os.path.join(out_dir, 'normal_1x1_entro.png'))
+        plt.savefig(os.path.join(out_dir, 'normal_1x1_test_GLAS_mil.png'))
         # overlay_images = get_visaualization(exp_path=parsedargs.path_pre_trained_source, checkpoint_type=checkpoint_type, dataset=parsedargs.target_dataset, cudaid=parsedargs.cudaid, image_ids_to_draw=parsedargs.image_ids_to_draw, split='test', tmp_outd='tmp_outd')
         # overlay_images = get_visaualization(exp_path=parsedargs.target_domain_exp_path['SFDE'], checkpoint_type=checkpoint_type, dataset=parsedargs.target_dataset, cudaid=parsedargs.cudaid, image_ids_to_draw=parsedargs.image_ids_to_draw, split='test', tmp_outd='tmp_outd')
         # overlay_images = get_visaualization(exp_path=parsedargs.target_domain_exp_path['SHOT'], checkpoint_type=checkpoint_type, dataset=parsedargs.target_dataset, cudaid=parsedargs.cudaid, image_ids_to_draw=parsedargs.image_ids_to_draw, split='test', tmp_outd='tmp_outd')

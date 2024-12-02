@@ -1301,7 +1301,7 @@ def get_model(args, eval=False, eval_path_weights=''):
         model_src.eval()
         freeze_all_params(model_src)
 
-        if args.shot or args.faust or args.sfde or args.cdcl:  # shot/faust/sfde/cdcl methods
+        if args.shot or args.faust or args.sfde or args.cdcl or args.esfda:  # shot/faust/sfde/cdcl methods
             model.train()
             model.freeze_cl_hypothesis()  # last linear weights + bias of
             # classifier. some wsol methods do not have a last linear
@@ -1572,6 +1572,10 @@ def sf_uda_load_set_source_weights(model, args: object):
             weights = torch.load(join(path, 'classification_head.pt'),
                                  map_location=cpu_device)
             model.classification_head.load_state_dict(weights, strict=True)
+            if args.method == constants.METHOD_ENERGY:
+                weights = torch.load(join(path, 'pixel_wise_classification_head.pt'),
+                                     map_location=cpu_device)
+                model.pixel_wise_classification_head.load_state_dict(weights, strict=True)
 
     elif args.task == constants.F_CL:
         weights = torch.load(join(path, 'encoder.pt'),

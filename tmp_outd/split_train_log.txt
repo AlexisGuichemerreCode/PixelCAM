@@ -1,10 +1,10 @@
-DLLL 2024-10-15 17:21:00.388908 0:00:00.150193 
-=================================================================================================
- TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: CAMELYON512 	 METHOD: DEEPMIL 	 ENCODER: RESNET50 	
-=================================================================================================
+DLLL 2024-11-27 00:36:38.479254 0:00:00.176703 
+===================================================================================================
+ TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: CAMELYON512 	 METHOD: ENERGYCAM 	 ENCODER: RESNET50 	
+===================================================================================================
 
-DLLL 2024-10-15 17:21:01.412778 0:00:01.174063 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 24036932
-DLLL 2024-10-15 17:21:01.412955 0:00:01.174240 Arch: STDClassifier
+DLLL 2024-11-27 00:36:38.934988 0:00:00.632437 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 26272581
+DLLL 2024-11-27 00:36:38.935069 0:00:00.632518 Arch: STDClassifier
 task: STD_CL
 encoder_name: resnet50
 encoder_weights: imagenet
@@ -16,10 +16,10 @@ aux_params:
 	kmin: 0.1
 	alpha: 0.6
 	dropout: 0.0
-	support_background: False
+	support_background: True
 	r: 10.0
 	mid_channels: 128
-	gated: True
+	gated: False
 	prm_ks: 3
 	prm_st: 1
 scale_in: 1.0
@@ -27,14 +27,15 @@ freeze_cl: False
 im_rec: False
 img_range: tanh 
 
-DLLL 2024-10-15 17:21:01.419072 0:00:01.180357 u-resnet50. Task: STD_CL. 
+DLLL 2024-11-27 00:36:38.937091 0:00:00.634540 u-resnet50. Task: STD_CL. 
  NBR-PARAMS: 
 	Encoder [resnet50]: 23508032. 
-	Classification head [DeepMIL]: 528900. 
-	Total: 24036932. 
+	Classification head [WGAP]: 6147. 
+	Pixel Wise Classification head [PixelWise]: 2758402. 
+	Total: 26272581. 
 
-DLLL 2024-10-15 17:21:01.542873 0:00:01.304158 
+DLLL 2024-11-27 00:36:39.003161 0:00:00.700610 
 ========================================================================================================================
- MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/MODEL_CVPR_2025/CAMELYON512/BLOC/ID_SOURCE_12_CAMELYON512_DEEPMIL_5-TSK_STD_CL-DS_CAMELYON512-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_DEEPMIL-SPOOLING_DEEPMIL-ARCH_STDCLASSIFIER-ECD_RESNET50/CAMELYON512-0-RESNET50-DEEPMIL-DEEPMIL-CP_BEST_LOCALIZATION
+ MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/MODEL_MIDL_2025/CAMELYON/BLOC/ENERGYCAM/PIXEL_SELECTED/EQUAL/100/ID_SOURCE_3_PROB_CL_100_CAMELYON512_ENERGYCAM_DEEPMIL_5_LOC-TSK_STD_CL-DS_CAMELYON512-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_ENERGYCAM-SPOOLING_WGAP-ARCH_STDCLASSIFIER-ECD_RESNET50/CAMELYON512-0-RESNET50-ENERGYCAM-WGAP-CP_BEST_CLASSIFICATION
 ========================================================================================================================
 

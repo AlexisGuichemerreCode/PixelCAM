@@ -511,6 +511,13 @@ def get_args(args: dict, eval: bool = False):
                         help='ENG: lambda value for loss .')
 
     # Domain adaptation
+    parser.add_argument('--target_domain_ds_to_compute_stats', type=str, default=None,
+                        help='Name of the target domain dataset to compute '
+                             'the stats.')
+    parser.add_argument('--ds_to_compute_acc_trainset_source_target', type=str, default=None,
+                        help='Compute the accuracy on the source and target '
+                             'train set.')
+    
     parser.add_argument('--sf_uda', type=str2bool, default=None,
                         help='If ture, we set the source free unsupervised '
                              'domain adaptation setup, if not, '
@@ -535,6 +542,8 @@ def get_args(args: dict, eval: bool = False):
                         help='Full path to the source folder. if it is '
                              'empty "", we determine automatically this '
                              'folder based on the provided info.')
+    parser.add_argument('--mask_root_target', default=None,
+                        help='path to masks target')
 
     # methods SFUDA
     # 1- SHOT
@@ -552,21 +561,25 @@ def get_args(args: dict, eval: bool = False):
     parser.add_argument('--faust_n_views', type=int, default=None,
                         help='Number of views for FAUST.')
 
-    # 2- NRC
+    # 3- NRC
     parser.add_argument('--nrc', type=str2bool, default=None,
                         help='USE/NOT NRC method for SFUDA.')
     parser.add_argument('--r_nrc', type=float, default=None,
                         help='Affinity Value for NRC.')
-    # SFUDA DE
+    # 4- SFUDA-DE
     parser.add_argument('--sfde', type=str2bool, default=None,
                         help='USE/NOT SFDE method for SFUDA.')
     parser.add_argument('--sfde_threshold', type=float, default=None,
                         help='Threshold, 0<T<=1.')
-    # 2- CDCL
+    # 5- CDCL
     parser.add_argument('--cdcl', type=str2bool, default=None,
                         help='USE/NOT CDCL method for SFUDA.')
     parser.add_argument('--cdcl_threshold', type=float, default=None,
                         help='Pourcentage of sample to keep for the method for each class.')
+
+    # 6- EnergySFDA
+    parser.add_argument('--esfda', type=str2bool, default=None,
+                        help='USE/NOT ESFDA method for SFUDA.')
 
 
     # losses SFUDA
@@ -816,6 +829,7 @@ def get_args(args: dict, eval: bool = False):
     parser.add_argument('--cdcl_lambda', type=float, default=None,
                         help='Parameter lambda for contrastive loss.')
     
+    
     input_parser = parser.parse_args()
 
     def warnit(name, vl_old, vl):
@@ -876,6 +890,20 @@ def get_args(args: dict, eval: bool = False):
     # the doc mentions that the above depends on `putenv()` of the
     # platform.
     # https://docs.python.org/3.7/library/os.html#os.environ
+    if args['target_domain_ds_to_compute_stats'] is not None or args['ds_to_compute_acc_trainset_source_target'] is not None:
+        if args['target_domain_ds_to_compute_stats'] is not None and args['ds_to_compute_acc_trainset_source_target'] is not None:
+            assert args['target_domain_ds_to_compute_stats'] == args['ds_to_compute_acc_trainset_source_target']
+
+        dsname_target_domain = args['target_domain_ds_to_compute_stats']
+        pre = constants.FORMAT_DEBUG.split('_')[0]
+        if dsname_target_domain.startswith(pre):
+            dsname_target_domain = dsname_target_domain.replace('{}_'.format(pre), '')
+        assert dsname_target_domain in [constants.CAMELYON512, constants.GLAS]
+        args['target_domain_data_paths'] = config.configure_data_paths(args, dsname_target_domain)
+        args['target_domain_metadata_root'] = join(constants.RELATIVE_META_ROOT, args['target_domain_ds_to_compute_stats'],
+                                     f"fold-{args['fold']}")
+        args['mask_root_target'] = join(args['mask_root_target'], args['target_domain_ds_to_compute_stats'])
+
     os.environ['MYSEED'] = str(args["MYSEED"])
 
     args['outd'], args['subpath'] = outfd(Dict2Obj(args), eval=eval)
@@ -1091,7 +1119,7 @@ def get_args(args: dict, eval: bool = False):
     if args.sf_uda:
         assert args.task in [constants.STD_CL, constants.NEGEV], args.task
 
-        l_sf_uda_techs = [args.shot, args.faust, args.adadsa, args.sdda, args.nrc, args.sfde, args.cdcl]
+        l_sf_uda_techs = [args.shot, args.faust, args.adadsa, args.sdda, args.nrc, args.sfde, args.cdcl, args.esfda]
 
         assert any(l_sf_uda_techs)
         assert sum(l_sf_uda_techs) == 1, 'Only one SFUDA must be active.'
@@ -1143,6 +1171,9 @@ def get_args(args: dict, eval: bool = False):
             assert args.nrc_neighborhood
         
         elif args.sfde:
+            pass
+
+        elif args.esfda:
             pass
 
         else:
@@ -1419,6 +1450,7 @@ def parse_input(eval=False):
                             help="Fold of dataset.")
         parser.add_argument("--magnification", type=str, default=None,
                             help="Magnififcation of BreakHis dataset.")
+
         input_args, _ = parser.parse_known_args()
         args: dict = config.get_config(ds=input_args.dataset,
                                        fold=input_args.fold,

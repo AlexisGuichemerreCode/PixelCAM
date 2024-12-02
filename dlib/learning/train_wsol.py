@@ -206,6 +206,46 @@ class Trainer(Basic):
             sfuda_n_rnd_views=self._get_faust_n_views()
         )
 
+        if self.args.target_domain_ds_to_compute_stats != None or self.args.ds_to_compute_acc_trainset_source_target != None:
+
+            self.target_domain_loaders = get_data_loader(
+                    data_roots=args.target_domain_data_paths,
+                    metadata_root=self.args.target_domain_metadata_root,
+                    batch_size=self.args.batch_size,
+                    eval_batch_size=self.args.eval_batch_size,
+                    workers=self.args.num_workers,
+                    resize_size=self.args.resize_size,
+                    crop_size=self.args.crop_size,
+                    load_tr_masks=self.load_tr_masks,
+                    mask_root=mask_root,
+                    proxy_training_set=self.args.proxy_training_set,
+                    num_val_sample_per_class=self.args.num_val_sample_per_class,
+                    std_cams_folder=None,
+                    get_splits_eval=[constants.TESTSET]
+                )
+            
+            self.source_domain_loaders = get_data_loader(
+                    data_roots=self.args.data_paths,
+                    metadata_root=self.args.metadata_root,
+                    batch_size=self.args.batch_size,
+                    eval_batch_size=self.args.eval_batch_size,
+                    workers=self.args.num_workers,
+                    resize_size=self.args.resize_size,
+                    crop_size=self.args.crop_size,
+                    load_tr_masks=self.load_tr_masks,
+                    mask_root=mask_root,
+                    proxy_training_set=self.args.proxy_training_set,
+                    num_val_sample_per_class=self.args.num_val_sample_per_class,
+                    std_cams_folder=None,
+                    get_splits_eval=[constants.TESTSET]
+                )
+            
+            self.target_acc_cl = []
+            self.source_acc_cl = []
+
+            self.target_acc_loc = []
+            self.source_acc_loc = []
+
         self.sl_mask_builder = None
         if args.task in [constants.F_CL, constants.NEGEV] or args.pixel_wise_classification:
             self.sl_mask_builder = self._get_sl(args)
@@ -379,6 +419,27 @@ class Trainer(Basic):
                         support_background = self.args.model['support_background'],
                         threshold= self.args.cdcl_threshold
                         )
+        
+        elif args.esfda:
+            mask_root = args.mask_root if self.load_tr_masks else ''
+            loaders = get_data_loader(
+                data_roots=self.args.data_paths,
+                metadata_root=self.args.metadata_root,
+                batch_size=self.args.batch_size,
+                eval_batch_size=self.args.eval_batch_size,
+                workers=self.args.num_workers,
+                resize_size=self.args.resize_size,
+                crop_size=self.args.crop_size,
+                load_tr_masks=self.load_tr_masks,
+                mask_root=mask_root,
+                proxy_training_set=self.args.proxy_training_set,
+                num_val_sample_per_class=self.args.num_val_sample_per_class,
+                std_cams_folder=None,
+                get_splits_eval=[constants.TRAINSET],
+                sfuda_faust=False,
+                sfuda_n_rnd_views=0
+            )
+            train_eval_loader = loaders[constants.TRAINSET]
         
         else:
             raise NotImplementedError('SFUDA: unspecified method.')
@@ -1194,6 +1255,97 @@ class Trainer(Basic):
 
         torch.cuda.empty_cache()
         return classification_acc.item()
+    
+    def compute_acc_on_source_and_target(self, epoch, split=constants.TESTSET):
+        target_acc = self._compute_accuracy(self.target_domain_loaders[constants.TESTSET])
+        self.target_acc_cl.append(target_acc)
+
+        source_acc = self._compute_accuracy(self.source_domain_loaders[constants.TESTSET])
+        self.source_acc_cl.append(source_acc)
+
+    def compute_loc_on_source_and_target(self, epoch, split=constants.TESTSET):
+
+        cam_computer_source = CAMComputer(
+            args=deepcopy(self.args),
+            model=self.model,
+            loader=self.source_domain_loaders[constants.TESTSET],
+            metadata_root=os.path.join(self.args.metadata_root, split),
+            mask_root=self.args.mask_root,
+            iou_threshold_list=self.args.iou_threshold_list,
+            dataset_name=self.args.dataset,
+            split=split,
+            cam_curve_interval=self.args.cam_curve_interval,
+            multi_contour_eval=self.args.multi_contour_eval,
+            out_folder=self.args.outd,
+            fcam_argmax=self.fcam_argmax,
+            best_valid_tau= None
+        )
+
+        cam_computer_target = CAMComputer(
+            args=deepcopy(self.args),
+            model=self.model,
+            loader=self.target_domain_loaders[constants.TESTSET],
+            metadata_root=os.path.join(self.args.target_domain_metadata_root, split),
+            mask_root=self.args.mask_root_target,
+            iou_threshold_list=self.args.iou_threshold_list,
+            dataset_name=self.args.target_domain_ds_to_compute_stats,
+            split=split,
+            cam_curve_interval=self.args.cam_curve_interval,
+            multi_contour_eval=self.args.multi_contour_eval,
+            out_folder=self.args.outd,
+            fcam_argmax=self.fcam_argmax,
+            best_valid_tau= None
+        )
+
+        cam_performance_source = cam_computer_source.compute_and_evaluate_cams()
+        cam_performance_target = cam_computer_target.compute_and_evaluate_cams()
+
+        self.target_acc_loc.append(cam_performance_target)
+        self.source_acc_loc.append(cam_performance_source)
+
+    def plot_source_target_acc_curves(self):
+        plt.figure(figsize=(12, 3))
+        plt.plot(self.source_acc_cl, label='Source')
+        plt.plot(self.target_acc_cl, label='Target')
+        plt.xlabel('Epoch')
+        plt.ylabel('CL Accuracy')
+        plt.legend()
+        #set y axis labels only in integer with max value to len of source and target acc
+        plt.xticks(np.arange(0, len(self.source_acc_cl), 2))
+        plt.tight_layout()
+        plt.savefig(os.path.join(self.args.outd, 'Classification accuracy curve on test set between source and target dataset.png'))
+        plt.close()
+
+        #Store data in a pickle
+        curves_data = {
+            'source_acc_cl': self.source_acc_cl,
+            'target_acc_cl': self.target_acc_cl
+        }
+        with open(os.path.join(self.args.outd, 'Accuracy_results_source_target_data.pickle'), 'wb') as f:
+            pkl.dump(curves_data, f)
+
+    def plot_source_target_loc_curves(self):
+        plt.figure(figsize=(12, 3))
+        plt.plot(self.source_acc_loc, label='Source')
+        plt.plot(self.target_acc_loc, label='Target')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loc Accuracy')
+        plt.legend()
+        #set y axis labels only in integer with max value to len of source and target acc
+        plt.xticks(np.arange(0, len(self.source_acc_loc), 2))
+        plt.tight_layout()
+        plt.savefig(os.path.join(self.args.outd, 'Localization accuracy curve on test set between source and target dataset.png'))
+        plt.close()
+
+        #Store data in a pickle
+        curves_data = {
+            'source_acc_loc': self.source_acc_loc,
+            'target_acc_loc': self.target_acc_cl
+        }
+        with open(os.path.join(self.args.outd, 'Localization_results_source_target_data.pickle'), 'wb') as f:
+            pkl.dump(curves_data, f)
+
+
 
     def evaluate(self, epoch, split, checkpoint_type=None, fcam_argmax=False):
         torch.cuda.empty_cache()

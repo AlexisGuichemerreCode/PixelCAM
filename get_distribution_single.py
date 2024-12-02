@@ -97,10 +97,14 @@ def _compute_accuracy(args, model, loader):
     classification_acc = num_correct / float(num_images) * 100
     return classification_acc
 
-def extract_features_source_target(mask_source, feature_source, label_source, cam_source, image_id_source,mask_target, feature_target, label_target, cam_target, image_id_target):
+def extract_features_source_target(mask_source, feature_source, label_source, cam_source, image_id_source):
     cancer_features = np.empty((0, 2048))
     non_cancer_features = np.empty((0, 2048))
     background_features = np.empty((0, 2048))
+
+    # cancer_features = np.empty((0, 256))
+    # non_cancer_features = np.empty((0, 256))
+    # background_features = np.empty((0, 256))
 
     #source
     mask_source = torch.from_numpy(mask_source)
@@ -112,44 +116,48 @@ def extract_features_source_target(mask_source, feature_source, label_source, ca
     features2_source = zero_feature_source.detach().cpu().numpy().T
 
     #target
-    mask_target = torch.from_numpy(mask_target)
-    non_zero_indices_target = torch.nonzero(mask_target, as_tuple=True)
-    non_zero_feature_target = feature_target[0, :, non_zero_indices_target[0], non_zero_indices_target[1]]
-    zero_indices_target = torch.nonzero(mask_target == 0, as_tuple=True)
-    zero_feature_target = feature_target[0, :, zero_indices_target[0], zero_indices_target[1]]
-    features1_target = non_zero_feature_target.detach().cpu().numpy().T
-    features2_target= zero_feature_target.detach().cpu().numpy().T
+    # mask_target = torch.from_numpy(mask_target)
+    # non_zero_indices_target = torch.nonzero(mask_target, as_tuple=True)
+    # non_zero_feature_target = feature_target[0, :, non_zero_indices_target[0], non_zero_indices_target[1]]
+    # zero_indices_target = torch.nonzero(mask_target == 0, as_tuple=True)
+    # zero_feature_target = feature_target[0, :, zero_indices_target[0], zero_indices_target[1]]
+    # features1_target = non_zero_feature_target.detach().cpu().numpy().T
+    # features2_target= zero_feature_target.detach().cpu().numpy().T
 
-
-    all_features = np.concatenate([features1_source, features2_source, features1_target, features2_target])
+    # anchors_resize = anchors.squeeze().detach().cpu().numpy()
+    all_features = np.concatenate([features1_source, features2_source])
     tsne = TSNE(n_components=2)
     embedded_features = tsne.fit_transform(all_features)
 
     # Diviser les features intégrées en fonction de la taille des listes de features originales
     embedded_features1_source = embedded_features[:features1_source.shape[0]]
     embedded_features2_source = embedded_features[features1_source.shape[0]:features1_source.shape[0]+features2_source.shape[0]]
-    embedded_features1_target = embedded_features[features1_source.shape[0]+features2_source.shape[0]:features1_source.shape[0]+features2_source.shape[0]+features1_target.shape[0]]
-    embedded_features2_target = embedded_features[features1_source.shape[0]+features2_source.shape[0]+features1_target.shape[0]:]
+    # embedded_features1_target = embedded_features[features1_source.shape[0]+features2_source.shape[0]:features1_source.shape[0]+features2_source.shape[0]+features1_target.shape[0]]
+    # embedded_features2_target = embedded_features[features1_source.shape[0]+features2_source.shape[0]+features1_target.shape[0]:]
 
     # Visualiser les résultats avec un code couleur
-    plt.scatter(embedded_features1_source[:, 0], embedded_features1_source[:, 1], color='blue', label='Foreground Source')
-    plt.scatter(embedded_features2_source[:, 0], embedded_features2_source[:, 1], color='red', label='Background Source')
-    plt.scatter(embedded_features1_target[:, 0], embedded_features1_target[:, 1], color='black', label='Foreground Target')
-    plt.scatter(embedded_features2_target[:, 0], embedded_features2_target[:, 1], color='orange', label='Background Target')
+    plt.scatter(embedded_features1_source[:, 0], embedded_features1_source[:, 1], color='blue', label='Foreground GLAS')
+    plt.scatter(embedded_features2_source[:, 0], embedded_features2_source[:, 1], color='red', label='Background GLAS')
+    # plt.scatter(embedded_features1_target[:, 0], embedded_features1_target[:, 1], color='black')
+    # plt.scatter(embedded_features2_target[:, 0], embedded_features2_target[:, 1], color='orange', label='Background CAMELYON')
 
   
     plt.legend()
     if label_source == 1:
         classe = 'cancer'
     else:
-        classe = 'non-cancer'
+        classe = 'normal'
 
 
     parts = image_id_source.split('/')
     clean_image_id = parts[1].replace('.bmp', '')
-    plt.title(f"T-SNE visualization between source and target features \n from GLAS to CAMELYON at the pixel level \n for a {classe} image ", fontsize=10)
+    plt.title(f"T-SNE visualization for a {classe} image ", fontsize=10)
     # Sauvegarder l'image
-    plt.savefig(f'tsne_plot_shift_{clean_image_id}.png')
+    output_dir = os.path.join('visualization', 'tsne')
+    os.makedirs(output_dir, exist_ok=True)
+
+    filename = os.path.join(output_dir, f"{clean_image_id}_tsne.png")
+    plt.savefig(filename)
     plt.close()
     return cancer_features, non_cancer_features, background_features
 
@@ -161,7 +169,7 @@ def extract_features(mask, feature, label, cam, image_id):
     background_features = np.empty((0, 2048))
 
     mask = torch.from_numpy(mask)
-    mask_cam = cam > 0.2
+    #mask_cam = cam > 0.2
 
     # Interpolate feature to image size
     #feature = F.interpolate(feature.unsqueeze(0), size=mask.shape, mode='bilinear', align_corners=False).squeeze(0)
@@ -309,23 +317,13 @@ IgnoreKeyLoader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, 
 IgnoreKeyLoader.add_constructor('tag:yaml.org,2002:python/object/apply:numpy.core.multiarray.scalar', IgnoreKeyLoader.ignore_numpy_scalars)
 
 
-def get_cam(exp_path, checkpoint_type, dataset, cudaid, split='train', tmp_outd='tmp_outd', path_cam= None, parsedargs=None):
-    # config_model.yaml
-    # if parsedargs.draw_vis_with_best_source_classifier:
-    #     print('wait')
-    #     exp_path = exp_path.replace('models_benchmark', 'model_benchmarks_classification')
-    # if target_method != 'SOURCE':
-    #     tmp_exp_path = glob(f'{exp_path}/*/')
-    #     assert len(tmp_exp_path) == 1
-    #     exp_path = tmp_exp_path[0]
-    # if target_method == 'SOURCE' and parsedargs.draw_vis_with_best_source_classifier:
-    #     checkpoint_type = constants.BEST_CL
+def get_features(exp_path, sf_uda_source_folder,image_ids_to_draw,image_ids_to_draw_target, checkpoint_type, dataset, cudaid, split, tmp_outd='tmp_outd', parsedargs=None):
+
 
     with open(join(exp_path, 'config_obj_final.yaml'), 'r') as fy:
         args_dict = yaml.load(fy, Loader=IgnoreKeyLoader)
         # args_dict = yaml.safe_load(fy)
         args_dict['model']['freeze_encoder'] = False
-        args_dict['pixel_wise_classification'] = False
         args = Dict2Obj(args_dict)
         args.outd = tmp_outd
         args.distributed = False
@@ -355,7 +353,7 @@ def get_cam(exp_path, checkpoint_type, dataset, cudaid, split='train', tmp_outd=
 
     device = torch.device('cuda:{}'.format(cudaid))
     
-    tag = get_tag(args, checkpoint_type=checkpoint_type)
+    #tag = get_tag(args, checkpoint_type=checkpoint_type)
     # path_cl = join(exp_path, tag)
     # args.sf_uda_source_folder = path_cl
     # config_model.yaml
@@ -365,8 +363,6 @@ def get_cam(exp_path, checkpoint_type, dataset, cudaid, split='train', tmp_outd=
         args_dict = yaml.load(fy, Loader=IgnoreKeyLoader)
         # args_dict = yaml.safe_load(fy)
         # args_dict['model']['freeze_encoder'] = False
-        args_dict['pixel_wise_classification'] = True
-        #args_dict['model']['spatial_dropout'] = 0.0
         args = Dict2Obj(args_dict)
         args.outd = tmp_outd
         args.distributed = False
@@ -390,14 +386,21 @@ def get_cam(exp_path, checkpoint_type, dataset, cudaid, split='train', tmp_outd=
                             map_location=get_cpu_device())
         model.classification_head.load_state_dict(header_w, strict=True)
 
-        pixel_header_w = torch.load(join(path_cl, 'pixel_wise_classification_head.pt'),
+        if method_name == constants.METHOD_ENERGY:
+            header_p = torch.load(join(path_cl, 'pixel_wise_classification_head.pt'),
                             map_location=get_cpu_device())
-        model.pixel_wise_classification_head.load_state_dict(pixel_header_w, strict=True)
+            model.pixel_wise_classification_head.load_state_dict(header_p, strict=True)
+
+
+
 
     DLLogger.log(fmsg("Model checkpoint Loaded from {}".format(path_cl)))
         
     model.to(device)
     model.eval()
+
+    # with torch.no_grad():
+    #     anchors = model.pixel_wise_classification_head.conv4.weight
 
     basic_config = config.get_config(ds=source_dataset, fold=args.fold, magnification=args.magnification)
 
@@ -449,24 +452,24 @@ def get_cam(exp_path, checkpoint_type, dataset, cudaid, split='train', tmp_outd=
             num_val_sample_per_class=args.num_val_sample_per_class,
             std_cams_folder=args.std_cams_folder,
             # distributed_eval=False,
-            get_splits_eval=[constants.TRAINSET],
+            get_splits_eval=['test'],
+            #constants.TRAINSET
             eval_batch_size = 32#args.eval_batch_size,
-        )   
-    
+        )
+
     cam_computer = CAMComputer(
             args=deepcopy(args),
             model=model,
-            loader=loaders[split],
-            metadata_root=os.path.join(metadata_root, split),
+            loader=loaders['test'],
+            metadata_root=os.path.join(metadata_root, 'test'),
             mask_root=args.mask_root,
             iou_threshold_list=args.iou_threshold_list,
             dataset_name=args.dataset,
-            split=split,
+            split= 'test',
             cam_curve_interval=args.cam_curve_interval,
             multi_contour_eval=args.multi_contour_eval,
             out_folder=args.outd,
-        )
-      
+        )   
     overlay_images = {}
     input_images = {}
     gt_masks = {}
@@ -477,36 +480,34 @@ def get_cam(exp_path, checkpoint_type, dataset, cudaid, split='train', tmp_outd=
         images = images.to(device)
         targets = targets.to(device)
         
-
-
+        #print(batch_idx)
         #with torch.no_grad():
         #    out = model(images.cuda())
         #    pixel_features = model.encoder_last_features
         GroundTruth = []
         for image, target, image_id in zip(images, targets, index):
-            #if image_id == "Warwick_QU_Dataset_(Released_2016_07_08)/train_2.bmp":
-                #print("wait")
-
-            #print(image_id)
+            if image_id not in image_ids_to_draw:
+                continue
             with torch.set_grad_enabled(cam_computer.req_grad):
                 cam, cl_logits = cam_computer.get_cam_one_sample(
                     image=image.unsqueeze(0), target=target.item())
                 
-                cam.detach()
+            with torch.no_grad():
+                out = model(image.cuda().unsqueeze(0))
+                pixel_features = model.encoder_last_features
 
-                # cam_np = cam.cpu().numpy()
-                # cam_np = ((cam_np - cam_np.min()) * (1/(cam_np.max() - cam_np.min()) * 255)).astype('uint8')
-                # cam_img = Image.fromarray(cam_np)
+                #pixel_features = model.loc_last_features
+            gt_mask = get_mask(f'/export/gauss/vision/Aguichemerre/datasets/{dataset}',
+                           cam_computer.evaluator.mask_paths[image_id],
+                           cam_computer.evaluator.ignore_paths[image_id])
+            
+            probabilities = F.softmax(out, dim=1)
+            print(probabilities)
+            gt_resize = resize(gt_mask, (28, 28))
+            gt_resize = (gt_resize * 255).astype('uint8')
 
-
-                # image_idx = os.path.basename(image_id)
-                # file_wo_bmp = os.path.splitext(image_idx)[0]
-                # output_path = path_cam + '_' + file_pt
-                tmp = str(Path(image_id).with_suffix(''))
-                file_wo_bmp = tmp.replace('/', '_')
-                file_pt = f'{file_wo_bmp}.pt'
-                output_path = path_cam + '/' + file_pt
-                torch.save(cam, output_path)
+            cancer_features, non_cancer_features, background_features = extract_features_source_target(gt_resize, pixel_features, target, cam, image_id)
+            #cancer_features, non_cancer_features, background_features = extract_features(gt_resize, pixel_features, target, cam, image_id)
 
 
     return overlay_images, input_images, method_name, gt_masks
@@ -519,28 +520,19 @@ def fast_eval():
     parser.add_argument("--split", type=str, default=None)
     parser.add_argument("--checkpoint_type", type=str, default=None)
     parser.add_argument("--encoder_name", type=str, default=None)
-    parser.add_argument("--pixel_wise_classification", type=str2bool, default=False)
-    
     # parser.add_argument("--exp_path", type=str, default=None)
     parser.add_argument("--tmp_outd", type=str, default='tmp_outd')
     parser.add_argument('--noise_level_for_eval_with_noisy_bbox', nargs='+',
                         type=int, default=[5, 10, 15, 20, 25, 30, 35 ,40, 45, 50])
     #parser.add_argument("--target_dataset", type=str, default=None,
     #                    help="Name of the dataset.", required=True, choices=[constants.CAMELYON512, constants.GLAS])
-    #parser.add_argument('--image_ids_to_draw', nargs='+', type=str, default=None)
-    #parser.add_argument('--image_ids_to_draw_target', nargs='+', type=str, default=None)
+    parser.add_argument('--image_ids_to_draw', nargs='+', type=str, default=None)
+    parser.add_argument('--image_ids_to_draw_target', nargs='+', type=str, default=None)
     parser.add_argument("--source_dataset", type=str, default=None, help="Source dataset")
     parser.add_argument("--path_pre_trained_source", type=str, default=None, help="Path to the pre-trained source model.")
-    #parser.add_argument("--path_cam", type=str, default=None, help="Path to store CAMs.")
 
     parsedargs = parser.parse_args()
-
-
-    # if not os.path.exists(parsedargs.path_cam):
-    #     # If the path doesn't exist, create it
-    #     os.makedirs(parsedargs.path_cam)
-
-
+    
     os.makedirs('tmp_outd', exist_ok=True)  
     log_backends = [
                 # ArbJSONStreamBackend(Verbosity.VERBOSE,
@@ -563,7 +555,8 @@ def fast_eval():
     for checkpoint_type_extended in base_checkpoint_types:
         checkpoint_type = checkpoint_type_extended
         
-        split = parsedargs.split
+        #split = parsedargs.split
+        split = "test"
         # exp_path = parsedargs.exp_path
         # # checkpoint_type = parsedargs.checkpoint_type
         # # tmp_outd = join(parsedargs.tmp_outd, os.path.split(exp_path)[-1])#, 'split_'+split+'_'+checkpoint_type)
@@ -589,7 +582,7 @@ def fast_eval():
 
 
             #Get features at the pixel level
-            overlay_images, input_images, method_name, gt_masks = get_cam(exp_path=exp_path,checkpoint_type=checkpoint_type, dataset=parsedargs.source_dataset, cudaid=parsedargs.cudaid, split='train', tmp_outd='tmp_outd', path_cam = '/export/livia/home/vision/Aguichemerre/Pixel-Adaptation/data_cams/resnet50-deepmil-bloc-camelyon_cams_train', parsedargs=parsedargs)
+            overlay_images, input_images, method_name, gt_masks = get_features(exp_path=exp_path, sf_uda_source_folder=parsedargs.path_pre_trained_source,image_ids_to_draw=parsedargs.image_ids_to_draw,image_ids_to_draw_target=parsedargs.image_ids_to_draw_target, checkpoint_type=checkpoint_type, dataset=parsedargs.source_dataset, cudaid=parsedargs.cudaid, split=split, tmp_outd='tmp_outd', parsedargs=parsedargs)
 
 if __name__ == '__main__':
     fast_eval()

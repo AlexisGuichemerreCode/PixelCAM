@@ -64,6 +64,11 @@ def main():
         train_performance = trainer.train(
             split=constants.TRAINSET, epoch=epoch)
         trainer.evaluate(epoch, split=constants.VALIDSET)
+
+        if args.ds_to_compute_acc_trainset_source_target:
+            trainer.compute_acc_on_source_and_target(epoch)
+            trainer.compute_loc_on_source_and_target(epoch)
+
         trainer.model_selection(epoch=epoch)
 
         trainer.report_train(train_performance, epoch)
@@ -73,6 +78,11 @@ def main():
 
         trainer.adjust_learning_rate()
         DLLogger.flush()
+
+    if args.ds_to_compute_acc_trainset_source_target:
+        #dar curves for source and target clas acc in trainer.source_acc and trainer.target_acc
+        trainer.plot_source_target_acc_curves()  
+        trainer.plot_source_target_loc_curves()  
 
     trainer.save_checkpoints()
 
