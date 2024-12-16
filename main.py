@@ -65,9 +65,9 @@ def main():
             split=constants.TRAINSET, epoch=epoch)
         trainer.evaluate(epoch, split=constants.VALIDSET)
 
-        if args.ds_to_compute_acc_trainset_source_target:
-            trainer.compute_acc_on_source_and_target(epoch)
-            trainer.compute_loc_on_source_and_target(epoch)
+        # if args.ds_to_compute_acc_trainset_source_target and epoch % args.cmpt_epoch == 0:
+        #     trainer.compute_acc_on_source_and_target(epoch)
+        #     trainer.compute_loc_on_source_and_target(epoch)
 
         trainer.model_selection(epoch=epoch)
 
@@ -81,8 +81,11 @@ def main():
 
     if args.ds_to_compute_acc_trainset_source_target:
         #dar curves for source and target clas acc in trainer.source_acc and trainer.target_acc
-        trainer.plot_source_target_acc_curves()  
-        trainer.plot_source_target_loc_curves()  
+        trainer.save_curves(task = "cl", cmpt_epoch = args.cmpt_epoch)
+        #trainer.plot_source_target_acc_curves(task = "cl", cmpt_epoch = args.cmpt_epoch)
+        #trainer.plot_source_target_acc_curves(task = "loc", cmpt_epoch = args.cmpt_epoch)
+
+        #trainer.plot_source_target_loc_curves(cmpt_epoch = args.cmpt_epoch)  
 
     trainer.save_checkpoints()
 

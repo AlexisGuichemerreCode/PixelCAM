@@ -424,7 +424,7 @@ class TrainerSdda(Trainer):
 
         print('Self.adv_d_loss status:')
         self.adv_d_loss.check_losses_status()
-
+        
         self.t_end_epoch = dt.datetime.now()
         delta_t = self.t_end_epoch - self.t_init_epoch
         DLLogger.log(fmsg(f'Train epoch runtime: {delta_t}'))

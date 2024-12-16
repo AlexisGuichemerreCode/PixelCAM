@@ -377,6 +377,7 @@ class MaskEvaluator(LocalizationEvaluator):
 
         self.gt_true_score_hist = np.zeros(self.num_bins, dtype=float)
         self.gt_false_score_hist = np.zeros(self.num_bins, dtype=float)
+        
 
     def accumulate(self, scoremap, image_id, target=None, preds_ordered=None):
         """
@@ -469,6 +470,9 @@ class MaskEvaluator(LocalizationEvaluator):
 
         idx = np.argmin(np.abs(
             self.threshold_list_right_edge - self.best_tau_list[0]))
+        
+        idx_0_5 = np.argmin(np.abs(
+            self.threshold_list_right_edge - 0.5))
 
         total_fg = float(tp[idx] + fn[idx])
         total_bg = float(tn[idx] + fp[idx])
@@ -483,6 +487,12 @@ class MaskEvaluator(LocalizationEvaluator):
             constants.MTR_DICEBG: 100 * dice_bg[idx],
             constants.MTR_MIOU: 100 * miou[idx],
             constants.MTR_BESTTAU: self.best_tau_list,
+
+            constants.MTR_DICEFG_05: 100 * dice_fg[idx_0_5],
+            constants.MTR_DICEBG_05: 100 * dice_bg[idx_0_5],
+            constants.MTR_MIOU_05: 100 * miou[idx_0_5],
+
+
             # areas.
             constants.MTR_AREA_TP: 100 * self._area(tp) / total_fg,
             constants.MTR_AREA_FN: 100 * self._area(fn) / total_fg,

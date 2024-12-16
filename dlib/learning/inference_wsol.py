@@ -19,6 +19,7 @@ from torch.utils.data import DataLoader
 import torch.nn.functional as F
 
 from torch.cuda.amp import autocast
+from torch.distributions import Categorical
 
 from tqdm import tqdm as tqdm
 
@@ -188,6 +189,29 @@ class CAMComputer(object):
 
     def _build_seg_extractor(self, model, args):
         return build_seg_extractor(model=model, args=args)
+    
+    def get_cam_multiple_samples(self, images: torch.Tensor, targets: int,
+                           ) -> Tuple[torch.Tensor, torch.Tensor]:
+        
+        img_shape = images[0].shape[2:]
+        
+        with autocast(enabled=self.args.amp_eval):
+            if self.special1:
+                output = self.model(images, labels=targets)
+            else:
+                output = self.model(images)
+
+        if self.args.method == constants.METHOD_ENERGY:
+                cl_logits = output
+                cam = self.std_cam_extractor(
+                                         class_idx=targets,
+                                         scores=cl_logits,
+                                         normalized=True,
+                                         reshape=img_shape if self.special1
+                                         else None)
+                cam = torch.nan_to_num(cam, nan=0.0, posinf=1., neginf=0.0)
+                # cl_logits: 1, nc.
+                return cam, cl_logits
 
     def get_cam_one_sample(self, image: torch.Tensor, target: int,
                            ) -> Tuple[torch.Tensor, torch.Tensor]:
@@ -252,7 +276,7 @@ class CAMComputer(object):
         # cl_logits: 1, nc.
         return cam, cl_logits
 
-    def minibatch_accum(self, images, targets, image_ids, image_size) -> None:
+    def minibatch_accum(self, images, targets, image_ids, image_size, eval_entropy = False) -> None:
 
         for image, target, image_id in zip(images, targets, image_ids):
 
@@ -266,6 +290,13 @@ class CAMComputer(object):
                                     mode='bilinear',
                                     align_corners=False).squeeze(0).squeeze(0)
                 cam = cam.detach()
+
+                if eval_entropy:
+                    gt_mask = get_mask(self.evaluator.mask_root,
+                                           self.evaluator.mask_paths[image_id],
+                                           self.evaluator.ignore_paths[image_id])
+                    loc_pred = self.model.cam
+                
                 # todo:
                 # cam = torch.clamp(cam, min=0.0, max=1.)
 
@@ -309,6 +340,7 @@ class CAMComputer(object):
 
             image_size = images.shape[2:]
             images = images.cuda()
+
 
             self.minibatch_accum(images=images,
                                  targets=targets,

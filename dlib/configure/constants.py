@@ -481,6 +481,10 @@ MTR_DICEBG = 'Dice background'
 MTR_MIOU = 'MIOU'
 MTR_BESTTAU = 'Best tau'
 
+MTR_DICEFG_05 = 'Dice foreground 0.5'
+MTR_DICEBG_05 = 'Dice background 0.5'
+MTR_MIOU_05 = 'MIOU 0.5'
+
 MTR_AREA_TP = 'Area true positive'
 MTR_AREA_TN = 'Area true negative'
 MTR_AREA_FN = 'Area false negative'

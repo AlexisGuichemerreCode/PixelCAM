@@ -517,6 +517,12 @@ def get_args(args: dict, eval: bool = False):
     parser.add_argument('--ds_to_compute_acc_trainset_source_target', type=str, default=None,
                         help='Compute the accuracy on the source and target '
                              'train set.')
+    parser.add_argument('--cmpt_epoch', type=int, default=None,
+                        help='Selected epoch to compute the accuracy on the source and target '
+                             'train set.')
+    parser.add_argument('--cmpt_batch', type=int, default=None,
+                        help='Selected batch to compute the accuracy on the source and target '
+                             'train set.')
     
     parser.add_argument('--sf_uda', type=str2bool, default=None,
                         help='If ture, we set the source free unsupervised '
@@ -900,8 +906,17 @@ def get_args(args: dict, eval: bool = False):
             dsname_target_domain = dsname_target_domain.replace('{}_'.format(pre), '')
         assert dsname_target_domain in [constants.CAMELYON512, constants.GLAS]
         args['target_domain_data_paths'] = config.configure_data_paths(args, dsname_target_domain)
-        args['target_domain_metadata_root'] = join(constants.RELATIVE_META_ROOT, args['target_domain_ds_to_compute_stats'],
+        if dsname_target_domain == constants.CAMELYON512:
+            args['target_domain_metadata_root'] = join(constants.RELATIVE_META_ROOT, args['target_domain_ds_to_compute_stats'],
+                                     f"fold-{6}")
+            args['source_domain_metadata_root'] = join(constants.RELATIVE_META_ROOT, constants.GLAS,
                                      f"fold-{args['fold']}")
+        else:
+            assert dsname_target_domain == constants.GLAS
+            args['target_domain_metadata_root'] = join(constants.RELATIVE_META_ROOT, args['target_domain_ds_to_compute_stats'], f"fold-{args['fold']}")
+            args['source_domain_metadata_root'] = join(constants.RELATIVE_META_ROOT, constants.CAMELYON512,
+                                     f"fold-{6}")
+        
         args['mask_root_target'] = join(args['mask_root_target'], args['target_domain_ds_to_compute_stats'])
 
     os.environ['MYSEED'] = str(args["MYSEED"])
@@ -934,6 +949,12 @@ def get_args(args: dict, eval: bool = False):
     else:
         args['multi_contour_eval'] = False
         args['multi_iou_eval'] = False
+
+
+    if args['model']['path_pre_trained_model_cl'] is not None:
+        tag = args['model']['path_pre_trained_model_cl']
+        args['model']['folder_pre_trained_cl'] = join(
+            root_dir, 'pretrained', tag)
 
     if args['model']['freeze_cl']:
         if args['task'] == constants.NEGEV:
@@ -1205,7 +1226,8 @@ def get_args(args: dict, eval: bool = False):
     if args.task == constants.SEG:
         assert args.dataset in [constants.GLAS, constants.CAMELYON512]
 
-    assert args.spatial_pooling == constants.METHOD_2_POOLINGHEAD[args.method]
+    if args.method != constants.METHOD_ENERGY:
+        assert args.spatial_pooling == constants.METHOD_2_POOLINGHEAD[args.method]
 
     assert args.model['encoder_name'] in constants.BACKBONES
     

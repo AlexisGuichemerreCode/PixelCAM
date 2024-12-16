@@ -521,6 +521,8 @@ def get_config(ds: str, fold: int, magnification: str) -> dict:
         'target_domain_ds_to_compute_stats': None, #Name of the target domain dataset to compute the stats
         'ds_to_compute_acc_trainset_source_target' : None, #Compute the accuracy on the source and target test set
         'mask_root_target': get_root_wsol_dataset(),  # path to masks target.
+        'cmpt_epoch': 1,  # int. epoch when to compute the stats.
+        'cmpt_batch': 10,  # int. batch when to compute the stats.
 
 
         # SFUDA methods ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
