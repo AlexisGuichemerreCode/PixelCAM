@@ -586,12 +586,12 @@ class EnergyCAM:
         #predicted_class = scores.argmax(dim=1)
         #self.predicted_class = predicted_class
         cam = self.compute_cams(class_idx=class_idx, argmax=argmax)
-        # if reshape is not None:
-        #     assert len(reshape) == 2
-        #     cam = F.interpolate(cam.unsqueeze(0).unsqueeze(0),
-        #                         reshape,
-        #                         mode='bilinear',
-        #                         align_corners=False).squeeze(0).squeeze(0)
+        if reshape is not None:
+            assert len(reshape) == 2
+            cam = F.interpolate(cam.unsqueeze(0).unsqueeze(0),
+                                reshape,
+                                mode='bilinear',
+                                align_corners=False).squeeze(0).squeeze(0)
         return cam
 
     def compute_cams(self, class_idx: int, argmax: bool = False, ) -> Tensor:

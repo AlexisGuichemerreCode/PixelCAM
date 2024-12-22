@@ -227,12 +227,13 @@ class CAMComputer(object):
 
             if self.args.method == constants.METHOD_ENERGY:
                 cl_logits = output
+                #if self.args.low_res:
                 cam = self.std_cam_extractor(
-                                         class_idx=target,
-                                         scores=cl_logits,
-                                         normalized=True,
-                                         reshape=img_shape if self.special1
-                                         else None)
+                                        class_idx=target,
+                                        scores=cl_logits,
+                                        normalized=True,
+                                        reshape=img_shape if self.special1
+                                        else None)
                 cam = torch.nan_to_num(cam, nan=0.0, posinf=1., neginf=0.0)
                 # cl_logits: 1, nc.
                 return cam, cl_logits

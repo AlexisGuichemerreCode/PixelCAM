@@ -33,6 +33,7 @@ from dlib.losses.core import MaxSizePositiveNegev
 from dlib.losses.core import NegativeSamplesNegev
 
 from dlib.losses.core import EnergyCEloss
+from dlib.losses.core import PxOrtognalityloss
 from dlib.losses.core import EnergyMGloss
 from dlib.losses.core import ConRanFieldPxcams
 

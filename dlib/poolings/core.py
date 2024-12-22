@@ -5,6 +5,7 @@ import re
 import torch.nn as nn
 import torch
 import torch.nn.functional as F
+import numpy as np
 
 root_dir = dirname(dirname(dirname(abspath(__file__))))
 sys.path.append(root_dir)
@@ -26,7 +27,12 @@ class _BasicPooler(nn.Module):
                  mid_channels: int = 128,
                  gated: bool = False,
                  prm_ks: int = 3,
-                 prm_st: int = 1
+                 prm_st: int = 1,
+                 pixel_wise_classification: bool = False,
+                 batch_norm: bool = False, 
+                 multiple_layer: bool = False, 
+                 anchors_ortogonal: bool = False, 
+                 detach_pixel_classifier: bool = False
                  ):
         super(_BasicPooler, self).__init__()
 
@@ -295,7 +301,10 @@ class PixelWise(_BasicPooler):
     def __init__(self, **kwargs):
         super(PixelWise, self).__init__(**kwargs)
         self.name = 'PixelWise'
-
+        self.batch_norm = kwargs['batch_norm']
+        self.multiple_layer = kwargs['multiple_layer']
+        self.anchors_ortogonal = kwargs['anchors_ortogonal']
+        self.detach_pixel_classifier = kwargs['detach_pixel_classifier']
         classes = self.classes
         #if self.support_background:
         #    classes = classes + 1
@@ -322,12 +331,57 @@ class PixelWise(_BasicPooler):
         mid_features2 = mid_features1 // 2
         mid_features3 = mid_features2 // 2
 
+        if self.multiple_layer:
+            self.conv1 = self._make_layer(self.in_channels, mid_features1)
+            self.conv2 = self._make_layer(mid_features1, mid_features2)
+            self.conv3 = self._make_layer(mid_features2, mid_features3)
+            self.conv4 = nn.Conv2d(mid_features3, classes, kernel_size=1)
+        else:
+            if self.batch_norm:
+                self.bn = nn.BatchNorm2d(self.in_channels)
+                self.conv4 = nn.Conv2d(self.in_channels, classes, kernel_size=1)
+            else:
+                self.conv4 = nn.Conv2d(self.in_channels, classes, kernel_size=1)
+        print('a')
+
+        if self.anchors_ortogonal:
+            vectors = self.generate_orthogonal_vectors(self.in_channels)
+            self.update_weights_with_vectors(vectors)
+            self.freeze_classifier()
+
         #self.upsample = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=False)
         #self.layer1 = self._make_layer(self.in_channels, mid_features1)
         #self.layer2 = self._make_layer(mid_features1, mid_features2)
         #self.layer3 = self._make_layer(mid_features2, mid_features3)
         #self.conv4 = nn.Conv2d(mid_features3, classes, kernel_size=1)
-        self.conv4 = nn.Conv2d(self.in_channels, classes, kernel_size=1)
+
+        
+    def update_weights_with_vectors(self, vectors):
+
+        vectors = torch.tensor(vectors, dtype=self.conv4.weight.dtype, device=self.conv4.weight.device)
+        
+        # Reshape ou slice les vecteurs pour correspondre à la forme des poids
+        weight_shape = self.conv4.weight.shape  # (out_channels, in_channels, kernel_size, kernel_size)
+        in_channels = weight_shape[1]
+        out_channels = weight_shape[0]
+
+        if vectors.shape[0] != in_channels or vectors.shape[1] != out_channels:
+            raise ValueError("La taille des vecteurs ne correspond pas aux dimensions des poids.")
+
+        # Adapt the weights from the vectors
+        new_weights = vectors.view(*weight_shape)  
+
+        # Update the weights of the layer
+        with torch.no_grad():
+            self.conv4.weight.copy_(new_weights)
+
+
+    def generate_orthogonal_vectors(self, size_features):
+        matrix = np.random.randn(size_features, self.classes)
+        # QR decomposition
+        q, r = np.linalg.qr(matrix)
+        # return ortogonal vectors
+        return q 
 
 
     def _make_layer(self, in_channels, out_channels):
@@ -343,9 +397,23 @@ class PixelWise(_BasicPooler):
         # SFUDA: freeze the last linear weights + bias of the classifier
         self.freeze_part(self.conv)  
         
+    def freeze_classifier(self):
+        if self.multiple_layer:
+            layers = [self.conv1, self.conv2, self.conv3, self.conv4]
+        else:
+            layers = [self.conv4]
+
+        for layer in layers:
+            for param in layer.parameters():
+                param.requires_grad = False
+
+
     def forward(self, x: torch.Tensor, return_cams:bool=True) -> torch.Tensor:
         self.assert_x(x)
 
+        if self.detach_pixel_classifier:
+            x = x.detach()
+            
         #out1 = self.relu1(self.bn1(self.conv1(x)))
         #out2 = self.relu2(self.bn2(self.conv2(out1)))
         #out3 = self.relu3(self.bn3(self.conv3(out2)))
@@ -355,6 +423,18 @@ class PixelWise(_BasicPooler):
         # last_features = self.layer3(x)
         #logits = x
         #logits = x
+        if self.multiple_layer:
+            x = self.conv1(x)
+            x = self.conv2(x)
+            x = self.conv3(x)
+            logits = self.conv4(x)
+            return logits, logits
+        
+
+        
+        if self.batch_norm:
+            x = self.bn(x)
+        
         logits = self.conv4(x)
         # if return_cams:
         #     self.cams = logits

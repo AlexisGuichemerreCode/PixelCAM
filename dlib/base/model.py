@@ -43,8 +43,10 @@ class STDClModel(torch.nn.Module):
         if self.pixel_wise_classification:
             loc_last_features, loc_logits = self.pixel_wise_classification_head(features[-1])
             _, _, target_height, target_width = x.shape
-            resized_logits = F.interpolate(loc_logits, size=(target_height, target_width), mode='bilinear', align_corners=False)
-            self.cams =  resized_logits
+
+            #resized_logits = F.interpolate(loc_logits, size=(target_height, target_width), mode='bilinear', align_corners=False)
+            #self.cams =  resized_logits
+            self.cams = loc_logits
             self.loc_last_features = loc_last_features
         return cl_logits
 

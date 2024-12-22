@@ -379,12 +379,20 @@ def get_config(ds: str, fold: int, magnification: str) -> dict:
 
         #Pixel CAM ----------------------------------------------------------
         "pixel_wise_classification": False,  # Add this parameter to control the creation of the second head for localization for Energy Model
+        "batch_norm_pixel_classifier": False,
+        "multiple_layer_pixel_classifier": False,
+        "anchors_ortogonal": False,
+        "detach_pixel_classifier": False,
+        "low_res": False,
         "path_cam": None,  # path_cam for CAM for Energy Model
         "neg_samples_partial": False,  # use or not negative samples partial pixel-wise. allowed only
         "sl_pc_seeder": constants.SEED_PROB,  # type of seeder.
         "sl_pc_equalize": False,  # use or not equalize the number of positive and negative samples.
         "ece": False,  # use or not ECE.
         "ece_lambda": 1.,  # lambda for ECE.
+
+        "pxortho": False,  # use or not pxortho.
+        "pxortho_lambda": 1.,  # lambda for pxortho.
 
         "eng_marginal": False,  # use or not marginal energy.
         "eng_lambda": 1.,  # lambda for marginal energy.

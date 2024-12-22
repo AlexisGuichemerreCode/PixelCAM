@@ -742,6 +742,18 @@ def get_loss_source(args):
             EnergyCE_loss.set_it(ece_lambda=args.ece_lambda, apply_negative_samples=negative_samples, negative_c=constants.DS_NEG_CL[args.dataset])
             masterloss.add(EnergyCE_loss)
 
+        if args.pxortho:
+            lpxorth = losses.PxOrtognalityloss(
+                cuda_id=args.c_cudaid,
+                lambda_=args.neg_samples_ng_lambda,
+                support_background=support_background,
+                multi_label_flag=multi_label_flag,
+                start_epoch=args.neg_samples_ng_start_ep,
+                end_epoch=args.neg_samples_ng_end_ep
+            )
+            lpxorth.set_it(pxortho_lambda=args.pxortho_lambda)
+            masterloss.add(lpxorth)
+
         if args.neg_samples_ng:
             lnegs = losses.NegativeSamplesNegev(
                 cuda_id=args.c_cudaid,
@@ -821,7 +833,12 @@ def get_aux_params(args):
         "mid_channels": args.mil_mid_channels,
         "gated": args.mil_gated,
         'prm_ks': args.prm_ks if hasattr(args, 'prm_ks') else 3,
-        'prm_st': args.prm_st if hasattr(args, 'prm_st') else 1
+        'prm_st': args.prm_st if hasattr(args, 'prm_st') else 1,
+        'pixel_wise_classification' : args.pixel_wise_classification,
+        'batch_norm' : args.batch_norm_pixel_classifier,
+        'multiple_layer' :  args.multiple_layer_pixel_classifier,
+        'anchors_ortogonal' : args.anchors_ortogonal,
+        'detach_pixel_classifier' : args.detach_pixel_classifier
     }
 
 

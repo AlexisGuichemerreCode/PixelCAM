@@ -758,21 +758,40 @@ class Trainer(Basic):
             output = self.model(images)
 
             if args.task == constants.STD_CL:
+                _, _, h, w = self.model.encoder_last_features.shape
                 if args.pixel_wise_classification:
+                    interpolation_mode = 'bilinear'
                     if std_cams is None:
                         cams_inter = self.get_std_cams_minibatch(images=images,
                                                                 targets=z_label)
                     else:
                         cams_inter = std_cams
 
+                    if self.args.low_res:
+                        fcams=self.model.cams
+                    else:
+                        _, _, i, x = cams_inter.shape
+                        fcams= F.interpolate(self.model.cams,
+                                    (i, x),
+                                    mode=interpolation_mode,
+                                    align_corners=False)
+
                     with torch.no_grad():
-                        seeds = self.sl_mask_builder(cams_inter, class_idx= targets)
+                        if self.args.low_res:
+                            cams_inter = F.interpolate(cams_inter,
+                                    (h, w),
+                                    mode=interpolation_mode,
+                                    align_corners=False)
+
+                        seeds = self.sl_mask_builder(cams_inter, class_idx=targets)
+
+                    
 
                     cl_logits = output
                 
                     loss = self.loss(epoch=self.epoch,
                                     model=self.model,
-                                    fcams=self.model.cams,
+                                    fcams=fcams,
                                     cl_logits=cl_logits,
                                     glabel=y_global,
                                     pseudo_glabel=y_pl_global,

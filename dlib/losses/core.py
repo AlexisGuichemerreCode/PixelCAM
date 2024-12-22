@@ -22,6 +22,7 @@ from dlib.div_classifiers.parts.acol import get_loss as get_acol_loss
 
 from dlib.configure import constants
 from dlib.losses.element import ElementaryLoss
+from dlib.losses.ortho_px import OrthogonalProjectionLoss
 
 __all__ = [
     'MasterLoss',
@@ -43,6 +44,7 @@ __all__ = [
     'MaxSizePositiveNegev',
     'NegativeSamplesNegev',
     'EnergyCEloss',
+    'PxOrtognalityloss',
     'Energy_Marginal'
 ]
 
@@ -1197,6 +1199,52 @@ class EnergyCEloss(SelfLearningFcams):
         fcams_n_neg = fcams[ind_non_neg]
         seeds_n_neg = seeds[ind_non_neg]
         return self.loss(input=fcams_n_neg, target=seeds_n_neg) * self.ece_lambda
+    
+class PxOrtognalityloss(SelfLearningFcams):
+    def __init__(self, **kwargs):
+        super(PxOrtognalityloss, self).__init__(**kwargs)
+
+        self.loss = OrthogonalProjectionLoss()
+
+        self.pxortho_lambda = 0.0
+        self.apply_negative_samples: bool = False
+        self.negative_c: int = 0
+
+        self._is_already_set = False
+
+    def set_it(self,pxortho_lambda):
+
+        self.pxortho_lambda = pxortho_lambda
+        self._is_already_set = True
+
+    def forward(self,
+                epoch=0,
+                model=None,
+                cams_inter=None,
+                fcams=None,
+                cl_logits=None,
+                seg_logits=None,
+                glabel=None,
+                pseudo_glabel=None,
+                masks=None,
+                raw_img=None,
+                x_in=None,
+                im_recon=None,
+                seeds=None,
+                cutmix_holder=None,
+                key_arg: dict = None
+                ):
+        super(SelfLearningFcams, self).forward(epoch=epoch)
+
+        assert self._is_already_set
+
+        if not self.is_on():
+            return self._zero
+
+        encoder_last_features_upsampled = F.interpolate(
+            model.encoder_last_features, size=seeds.shape[1:], mode='bilinear', align_corners=False)
+
+        return self.loss(features=encoder_last_features_upsampled, labels=seeds) * self.pxortho_lambda
     
 
 class ConRanFieldPxcams(ElementaryLoss):
