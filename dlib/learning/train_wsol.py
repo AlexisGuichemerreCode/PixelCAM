@@ -758,8 +758,8 @@ class Trainer(Basic):
             output = self.model(images)
 
             if args.task == constants.STD_CL:
-                _, _, h, w = self.model.encoder_last_features.shape
                 if args.pixel_wise_classification:
+                    _, _, h, w = self.model.encoder_last_features.shape
                     interpolation_mode = 'bilinear'
                     if std_cams is None:
                         cams_inter = self.get_std_cams_minibatch(images=images,
@@ -788,7 +788,6 @@ class Trainer(Basic):
                     
 
                     cl_logits = output
-                
                     loss = self.loss(epoch=self.epoch,
                                     model=self.model,
                                     fcams=fcams,
@@ -802,12 +801,14 @@ class Trainer(Basic):
                     logits = cl_logits
                 else:
                     cl_logits = output
+                    loss_params = {'sat_aux_losses': self.model.losses_dict, "sat_area_th": self.args.sat_area_th} if self.args.method == constants.METHOD_SAT else {}
                     loss = self.loss(epoch=self.epoch,
                                     model=self.model,
                                     cl_logits=cl_logits,
                                     glabel=y_global,
                                     pseudo_glabel=y_pl_global,
-                                    cutmix_holder=cutmix_holder
+                                    cutmix_holder=cutmix_holder,
+                                    **loss_params
                                     )
                     logits = cl_logits
 
