@@ -31,6 +31,7 @@ class _BasicPooler(nn.Module):
                  pixel_wise_classification: bool = False,
                  batch_norm: bool = False, 
                  multiple_layer: bool = False, 
+                 one_layer: bool = False,
                  anchors_ortogonal: bool = False, 
                  detach_pixel_classifier: bool = False
                  ):
@@ -303,6 +304,7 @@ class PixelWise(_BasicPooler):
         self.name = 'PixelWise'
         self.batch_norm = kwargs['batch_norm']
         self.multiple_layer = kwargs['multiple_layer']
+        self.one_layer = kwargs['one_layer']
         self.anchors_ortogonal = kwargs['anchors_ortogonal']
         self.detach_pixel_classifier = kwargs['detach_pixel_classifier']
         classes = self.classes
@@ -336,13 +338,15 @@ class PixelWise(_BasicPooler):
             self.conv2 = self._make_layer(mid_features1, mid_features2)
             self.conv3 = self._make_layer(mid_features2, mid_features3)
             self.conv4 = nn.Conv2d(mid_features3, classes, kernel_size=1)
+        elif self.one_layer:
+            self.conv3 = self._make_layer(self.in_channels, mid_features2)
+            self.conv4 = nn.Conv2d(mid_features2, classes, kernel_size=1)
         else:
             if self.batch_norm:
                 self.bn = nn.BatchNorm2d(self.in_channels)
                 self.conv4 = nn.Conv2d(self.in_channels, classes, kernel_size=1)
             else:
                 self.conv4 = nn.Conv2d(self.in_channels, classes, kernel_size=1)
-        print('a')
 
         if self.anchors_ortogonal:
             vectors = self.generate_orthogonal_vectors(self.in_channels)
@@ -400,6 +404,8 @@ class PixelWise(_BasicPooler):
     def freeze_classifier(self):
         if self.multiple_layer:
             layers = [self.conv1, self.conv2, self.conv3, self.conv4]
+        elif self.one_layer:
+            layers =  [self.conv3, self.conv4]
         else:
             layers = [self.conv4]
 
@@ -430,8 +436,12 @@ class PixelWise(_BasicPooler):
             logits = self.conv4(x)
             return logits, logits
         
-
+        if self.one_layer:
+            x = self.conv3(x)
+            logits = self.conv4(x)
+            return logits, logits
         
+
         if self.batch_norm:
             x = self.bn(x)
         

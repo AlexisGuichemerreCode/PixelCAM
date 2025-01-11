@@ -381,6 +381,7 @@ def get_config(ds: str, fold: int, magnification: str) -> dict:
         "pixel_wise_classification": False,  # Add this parameter to control the creation of the second head for localization for Energy Model
         "batch_norm_pixel_classifier": False,
         "multiple_layer_pixel_classifier": False,
+        "one_layer_pixel_classifier": False,
         "anchors_ortogonal": False,
         "detach_pixel_classifier": False,
         "low_res": False,

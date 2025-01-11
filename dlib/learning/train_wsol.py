@@ -1679,8 +1679,8 @@ class Trainer(Basic):
         DLLogger.log(fmsg("CAM EVALUATE TIME of {} split: {}".format(
             split, dt.datetime.now() - t0)))
 
-        if split == constants.TESTSET:
-            cam_computer.draw_some_best_pred()
+        #if split == constants.TESTSET:
+            #cam_computer.draw_some_best_pred()
 
         avg = self.args.multi_iou_eval
         avg |= self.args.dataset in [constants.OpenImages, constants.GLAS,
@@ -1972,7 +1972,8 @@ class Trainer(Basic):
 
     def model_selection(self, epoch):
 
-        self.model.flush()
+        if self.args.method != constants.METHOD_MAXMIN:
+            self.model.flush()
 
         if self._is_best_model_loc(epoch):
             self.best_loc_model = deepcopy(

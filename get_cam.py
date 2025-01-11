@@ -366,6 +366,11 @@ def get_cam(exp_path, checkpoint_type, dataset, cudaid, split='train', tmp_outd=
         # args_dict = yaml.safe_load(fy)
         # args_dict['model']['freeze_encoder'] = False
         args_dict['pixel_wise_classification'] = True
+        args_dict['multiple_layer_pixel_classifier'] = False
+        args_dict['anchors_ortogonal'] = False
+        args_dict['detach_pixel_classifier'] = False
+        args_dict['batch_norm_pixel_classifier'] = False
+        args_dict['one_layer_pixel_classifier'] = False
         #args_dict['model']['spatial_dropout'] = 0.0
         args = Dict2Obj(args_dict)
         args.outd = tmp_outd
@@ -390,9 +395,9 @@ def get_cam(exp_path, checkpoint_type, dataset, cudaid, split='train', tmp_outd=
                             map_location=get_cpu_device())
         model.classification_head.load_state_dict(header_w, strict=True)
 
-        pixel_header_w = torch.load(join(path_cl, 'pixel_wise_classification_head.pt'),
-                            map_location=get_cpu_device())
-        model.pixel_wise_classification_head.load_state_dict(pixel_header_w, strict=True)
+        # pixel_header_w = torch.load(join(path_cl, 'pixel_wise_classification_head.pt'),
+        #                     map_location=get_cpu_device())
+        # model.pixel_wise_classification_head.load_state_dict(pixel_header_w, strict=True)
 
     DLLogger.log(fmsg("Model checkpoint Loaded from {}".format(path_cl)))
         
@@ -531,14 +536,14 @@ def fast_eval():
     #parser.add_argument('--image_ids_to_draw_target', nargs='+', type=str, default=None)
     parser.add_argument("--source_dataset", type=str, default=None, help="Source dataset")
     parser.add_argument("--path_pre_trained_source", type=str, default=None, help="Path to the pre-trained source model.")
-    #parser.add_argument("--path_cam", type=str, default=None, help="Path to store CAMs.")
+    parser.add_argument("--path_cam", type=str, default=None, help="Path to store CAMs.")
 
     parsedargs = parser.parse_args()
 
 
-    # if not os.path.exists(parsedargs.path_cam):
-    #     # If the path doesn't exist, create it
-    #     os.makedirs(parsedargs.path_cam)
+    if not os.path.exists(parsedargs.path_cam):
+        # If the path doesn't exist, create it
+        os.makedirs(parsedargs.path_cam)
 
 
     os.makedirs('tmp_outd', exist_ok=True)  
@@ -558,7 +563,9 @@ def fast_eval():
     DLLogger.init_arb(backends=log_backends, master_pid=os.getpid())
     ##########
 
-    base_checkpoint_types = [constants.BEST_LOC]
+    #base_checkpoint_types = [constants.BEST_LOC]
+    base_checkpoint_types = [parsedargs.checkpoint_type]
+   
         
     for checkpoint_type_extended in base_checkpoint_types:
         checkpoint_type = checkpoint_type_extended
@@ -589,7 +596,7 @@ def fast_eval():
 
 
             #Get features at the pixel level
-            overlay_images, input_images, method_name, gt_masks = get_cam(exp_path=exp_path,checkpoint_type=checkpoint_type, dataset=parsedargs.source_dataset, cudaid=parsedargs.cudaid, split='train', tmp_outd='tmp_outd', path_cam = '/export/livia/home/vision/Aguichemerre/Pixel-Adaptation/data_cams/resnet50-deepmil-bloc-camelyon_cams_train', parsedargs=parsedargs)
+            overlay_images, input_images, method_name, gt_masks = get_cam(exp_path=exp_path,checkpoint_type=checkpoint_type, dataset=parsedargs.source_dataset, cudaid=parsedargs.cudaid, split='train', tmp_outd='tmp_outd', path_cam = parsedargs.path_cam, parsedargs=parsedargs)
 
 if __name__ == '__main__':
     fast_eval()

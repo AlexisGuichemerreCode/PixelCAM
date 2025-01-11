@@ -837,6 +837,7 @@ def get_aux_params(args):
         'pixel_wise_classification' : args.pixel_wise_classification,
         'batch_norm' : args.batch_norm_pixel_classifier,
         'multiple_layer' :  args.multiple_layer_pixel_classifier,
+        'one_layer' :  args.one_layer_pixel_classifier,
         'anchors_ortogonal' : args.anchors_ortogonal,
         'detach_pixel_classifier' : args.detach_pixel_classifier
     }

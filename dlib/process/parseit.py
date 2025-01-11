@@ -496,6 +496,7 @@ def get_args(args: dict, eval: bool = False):
     
     parser.add_argument('--batch_norm_pixel_classifier', type=str2bool, default=None)
     parser.add_argument('--multiple_layer_pixel_classifier', type=str2bool, default=None)
+    parser.add_argument('--one_layer_pixel_classifier', type=str2bool, default=None)
     parser.add_argument('--anchors_ortogonal', type=str2bool, default=None)
     parser.add_argument('--detach_pixel_classifier', type=str2bool, default=None)
     parser.add_argument('--low_res', type=str2bool, default=None)
