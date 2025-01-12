@@ -29,6 +29,7 @@ class _BasicPooler(nn.Module):
                  prm_ks: int = 3,
                  prm_st: int = 1,
                  pixel_wise_classification: bool = False,
+                 freeze_cl: bool = False,
                  batch_norm: bool = False, 
                  multiple_layer: bool = False, 
                  one_layer: bool = False,

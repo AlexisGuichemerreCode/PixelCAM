@@ -34,7 +34,8 @@ class STDClassifier(STDClModel):
         aux_params: Optional[dict] = None,
         scale_in: float = 1.,
         spatial_dropout: float = 0.0,
-        pixel_wise_classification: bool = False  # Add this parameter to control the creation of the second head for localization for Energy Model
+        pixel_wise_classification: bool = False,  # Add this parameter to control the creation of the second head for localization for Energy Model
+        freeze_cl : bool = False
     ):
         super(STDClassifier, self).__init__()
 
@@ -43,6 +44,7 @@ class STDClassifier(STDClModel):
         assert scale_in > 0.
         self.scale_in = float(scale_in)
         self.pixel_wise_classification=pixel_wise_classification
+        self.freeze_cl = freeze_cl
 
         assert isinstance(spatial_dropout, float), spatial_dropout
         assert 0. <= spatial_dropout <= 1., spatial_dropout

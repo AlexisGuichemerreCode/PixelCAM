@@ -120,6 +120,14 @@ class STDClModel(torch.nn.Module):
                 assert not module.training
 
         return True
+    
+    def train(self, mode=True):
+        super(STDClModel, self).train(mode=mode)
+
+        if self.freeze_cl:
+            self.freeze_classifier()
+
+        return self
 
 class FCAMModel(torch.nn.Module):
     def initialize(self):

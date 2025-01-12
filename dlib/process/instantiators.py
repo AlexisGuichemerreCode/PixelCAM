@@ -829,6 +829,7 @@ def get_aux_params(args):
         "alpha": args.wc_alpha,
         "dropout": args.wc_dropout,
         "support_background": args.model['support_background'],
+        "freeze_cl": args.model['freeze_cl'],
         "r": args.lse_r,
         "mid_channels": args.mil_mid_channels,
         "gated": args.mil_gated,
@@ -1127,7 +1128,8 @@ def get_model(args, eval=False, eval_path_weights=''):
                     scale_in=p.scale_in,
                     spatial_dropout=p.spatial_dropout,
                     aux_params=aux_params,
-                    pixel_wise_classification=args.pixel_wise_classification
+                    pixel_wise_classification=args.pixel_wise_classification,
+                    freeze_cl=p.freeze_cl
                 )
         else:
             aux_params = get_aux_params(args)
