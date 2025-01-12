@@ -65,7 +65,9 @@ class MaxMinClassifier(STDClModel):
         aux_params: Optional[dict] = None,
         scale_in: float = 1.,
         w: float = 8.,
-        dataset_name: str = ''
+        dataset_name: str = '',
+        pixel_wise_classification: bool = False,  # Add this parameter to control the creation of the second head for localization for Energy Model
+        freeze_cl : bool = False
     ):
         super(MaxMinClassifier, self).__init__()
 
@@ -73,6 +75,9 @@ class MaxMinClassifier(STDClModel):
         self.task = constants.STD_CL
         assert scale_in > 0.
         self.scale_in = float(scale_in)
+
+        self.pixel_wise_classification=pixel_wise_classification
+        self.freeze_cl = freeze_cl
 
         self._assert_dataset_name(dataset_name)
         self.dataset_name = dataset_name

@@ -1112,7 +1112,9 @@ def get_model(args, eval=False, eval_path_weights=''):
                 scale_in=p.scale_in,
                 aux_params=aux_params,
                 w=args.maxmin_w,
-                dataset_name=args.dataset
+                dataset_name=args.dataset,
+                pixel_wise_classification=args.pixel_wise_classification,
+                freeze_cl=p.freeze_cl
             )
             
         elif args.method == constants.METHOD_ENERGY:
