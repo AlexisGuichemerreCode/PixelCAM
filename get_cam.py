@@ -365,7 +365,7 @@ def get_cam(exp_path, checkpoint_type, dataset, cudaid, split='train', tmp_outd=
         args_dict = yaml.load(fy, Loader=IgnoreKeyLoader)
         # args_dict = yaml.safe_load(fy)
         # args_dict['model']['freeze_encoder'] = False
-        args_dict['pixel_wise_classification'] = True
+        args_dict['pixel_wise_classification'] = False
         args_dict['multiple_layer_pixel_classifier'] = False
         args_dict['anchors_ortogonal'] = False
         args_dict['detach_pixel_classifier'] = False
@@ -382,7 +382,7 @@ def get_cam(exp_path, checkpoint_type, dataset, cudaid, split='train', tmp_outd=
     model = get_model(args)[0]
 
     print(f'Loading model for {method_name}-{encoder_name} from {path_cl}')
-    if "tscam" in encoder_name:
+    if any(keyword in encoder_name for keyword in ["tscam", "sat"]):
         model_tscam = torch.load(join(path_cl, 'model.pt'),map_location=get_cpu_device())
 
         model.load_state_dict(model_tscam, strict=True)

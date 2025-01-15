@@ -35,7 +35,10 @@ class STDClassifier(STDClModel):
         scale_in: float = 1.,
         spatial_dropout: float = 0.0,
         pixel_wise_classification: bool = False,  # Add this parameter to control the creation of the second head for localization for Energy Model
-        freeze_cl : bool = False
+        freeze_cl : bool = False,
+        num_classes : int =2,
+        drop_rate : bool = False,
+        drop_path_rate : bool = False
     ):
         super(STDClassifier, self).__init__()
 

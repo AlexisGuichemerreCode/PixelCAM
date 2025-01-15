@@ -1919,12 +1919,16 @@ class Trainer(Basic):
                                join(path, 'mask_head.pt'))
 
             elif self.args.method == constants.METHOD_ENERGY:
-                torch.save(_model.encoder.state_dict(),
-                           join(path, 'encoder.pt'))
-                torch.save(_model.classification_head.state_dict(),
-                           join(path, 'classification_head.pt')),
-                torch.save(_model.pixel_wise_classification_head.state_dict(),
-                            join(path, 'pixel_wise_classification_head.pt'))
+                if "deit" in self.args.model['encoder_name']:
+                    torch.save(_model.state_dict(),
+                           join(path, 'model.pt'))
+                else:
+                    torch.save(_model.encoder.state_dict(),
+                            join(path, 'encoder.pt'))
+                    torch.save(_model.classification_head.state_dict(),
+                            join(path, 'classification_head.pt')),
+                    torch.save(_model.pixel_wise_classification_head.state_dict(),
+                                join(path, 'pixel_wise_classification_head.pt'))
             else:
                 torch.save(_model.encoder.state_dict(),
                            join(path, 'encoder.pt'))
@@ -2029,21 +2033,26 @@ class Trainer(Basic):
                         weights, strict=True)
 
             else:
-                weights = torch.load(join(path, 'encoder.pt'),
+                if self.args.method == constants.METHOD_ENERGY and "deit" in self.args.model['encoder_name']:
+                    weights = torch.load(join(path, 'model.pt'),
                                      map_location=self.device)
-                self.model.encoder.super_load_state_dict(
-                    weights, strict=True)
+                    self.model.load_state_dict(weights, strict=True)
+                else:
+                    weights = torch.load(join(path, 'encoder.pt'),
+                                        map_location=self.device)
+                    self.model.encoder.super_load_state_dict(
+                        weights, strict=True)
 
-                weights = torch.load(join(path, 'classification_head.pt'),
-                                     map_location=self.device)
-                self.model.classification_head.load_state_dict(
-                    weights, strict=True)
-                
-                if self.args.method == constants.METHOD_ENERGY:
-                    weights = torch.load(join(path, 'pixel_wise_classification_head.pt'),
-                                     map_location=self.device)
-                    self.model.pixel_wise_classification_head.load_state_dict(
-                        weights, strict=True)   
+                    weights = torch.load(join(path, 'classification_head.pt'),
+                                        map_location=self.device)
+                    self.model.classification_head.load_state_dict(
+                        weights, strict=True)
+                    
+                    if self.args.method == constants.METHOD_ENERGY:
+                        weights = torch.load(join(path, 'pixel_wise_classification_head.pt'),
+                                        map_location=self.device)
+                        self.model.pixel_wise_classification_head.load_state_dict(
+                            weights, strict=True)   
 
         elif self.args.task in [constants.F_CL, constants.NEGEV]:
 

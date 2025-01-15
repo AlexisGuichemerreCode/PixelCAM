@@ -13,12 +13,15 @@ import scipy.stats as st
 import torch
 import torch.nn as nn
 from functools import partial
+from typing import Optional, Union, List
 
 from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 from timm.models.layers import DropPath, to_2tuple, trunc_normal_
 
 from dlib.configure import constants
 from dlib.utils.shared import count_params
+
+from dlib import poolings
 
 import sys
 from os.path import dirname, abspath, join
@@ -27,7 +30,7 @@ sys.path.append(root_dir)
 IMG_NET_W_FD = join(root_dir, constants.FOLDER_PRETRAINED_IMAGENET)
 
 __all__ = [
-    'deit_sat_tiny_patch16_224', 'deit_sat_small_patch16_224', 'deit_sat_base_patch16_224',
+    'deit_sat_tiny_patch16_224', 'deit_sat_small_patch16_224', 'deit_sat_base_patch16_224', 'SAT'
 ]
 
 def get_kernel(kernlen=3, nsig=6):    
@@ -80,7 +83,8 @@ default_cfgs = {
 class VisionTransformer(nn.Module):
     def __init__(self, img_size=224, patch_size=16, in_chans=3, num_classes=1000, embed_dim=768, depth=12,
                  num_heads=12, mlp_ratio=4., qkv_bias=False, qk_scale=None, drop_rate=0., attn_drop_rate=0.,
-                 drop_path_rate=0., hybrid_backbone=None, norm_layer=nn.LayerNorm, vis=False):
+                 drop_path_rate=0., hybrid_backbone=None, norm_layer=nn.LayerNorm, vis=False, encoder_depth = 5, scale_in = 1.0, spatial_dropout = 0.0, 
+                 aux_params: Optional[dict] = None, pixel_wise_classification = False, freeze_cl = False):
         super().__init__()
         self.num_classes = num_classes
         self.num_features = self.embed_dim = embed_dim   
@@ -137,7 +141,16 @@ class SAT(VisionTransformer):
         self.encoder_name: str = encoder_name
         self.task: str = constants.STD_CL
         self.classification_head = None
+        self.pixel_wise_classification = kwargs['pixel_wise_classification']
+        aux_params=kwargs['aux_params']
+        if self.pixel_wise_classification:
+            aux_params.pop('pooling_head')
         
+        if self.pixel_wise_classification:
+            self.pixel_wise_classification_head = poolings.__dict__['PixelWise'](
+                in_channels=self.embed_dim, **aux_params
+            )
+
         self.name = "u-{}".format(self.encoder_name)
         self.encoder_weights = encoder_weights
         self.cams = None
@@ -255,7 +268,7 @@ class SAT(VisionTransformer):
         for cur_depth, blk in enumerate(self.blocks):
             x,  mask = blk(x, cur_depth) 
             mask_all.append(mask)
-
+            
         x = self.norm(x)
         return x[:, 0], x[:, -1], x[:, 1:-1],  mask_all
 
@@ -273,6 +286,18 @@ class SAT(VisionTransformer):
         x_patch = torch.reshape(x_patch , [n, int(p**0.5), int(p**0.5), c])  
         x_patch = x_patch.permute([0, 3, 1, 2])   
         x_patch = x_patch.contiguous()
+
+        self.encoder_last_features = x_patch
+
+        if self.pixel_wise_classification:
+            loc_last_features, loc_logits = self.pixel_wise_classification_head(x_patch)
+
+
+            #resized_logits = F.interpolate(loc_logits, size=(target_height, target_width), mode='bilinear', align_corners=False)
+            #self.cams =  resized_logits
+            self.cams = loc_logits
+            self.loc_last_features = loc_last_features
+        
         x_patch = self.head(x_patch)
         x_logits = self.avgpool(x_patch).squeeze(3).squeeze(2) 
         mask_avg = mask_all.clone() 

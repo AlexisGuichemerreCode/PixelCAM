@@ -1082,6 +1082,7 @@ def get_model(args, eval=False, eval_path_weights=''):
                     spatial_dropout=p.spatial_dropout
                 )
             elif args.method == constants.METHOD_SAT:
+                aux_params = None
                 model = create_model(
                     task=args.task,
                     arch=p.arch,
@@ -1090,7 +1091,10 @@ def get_model(args, eval=False, eval_path_weights=''):
                     encoder_weights=encoder_weights,
                     num_classes=args.num_classes,
                     drop_rate=args.sat_drop_rate,
-                    drop_path_rate=args.sat_drop_path_rate
+                    drop_path_rate=args.sat_drop_path_rate,
+                    aux_params=aux_params,
+                    pixel_wise_classification=args.pixel_wise_classification,
+                    freeze_cl=p.freeze_cl
                 )
 
             else:
@@ -1131,7 +1135,10 @@ def get_model(args, eval=False, eval_path_weights=''):
                     spatial_dropout=p.spatial_dropout,
                     aux_params=aux_params,
                     pixel_wise_classification=args.pixel_wise_classification,
-                    freeze_cl=p.freeze_cl
+                    freeze_cl=p.freeze_cl,
+                    num_classes=args.num_classes,
+                    drop_rate=args.sat_drop_rate,
+                    drop_path_rate=args.sat_drop_path_rate
                 )
         else:
             aux_params = get_aux_params(args)
@@ -1244,7 +1251,11 @@ def get_model(args, eval=False, eval_path_weights=''):
               "model from {} .... [OK]".format(path_cl)
         warnings.warn(msg)
         DLLogger.log(msg)
-        if args.method == constants.METHOD_ENERGY:
+        if args.method == constants.METHOD_ENERGY and "deit" in args.model['encoder_name']:
+                    weights = torch.load(join(path_cl, 'model.pt'),
+                                     map_location=get_cpu_device())
+                    model.load_state_dict(weights, strict=False)
+        else:
             encoder_w = torch.load(join(path_cl, 'encoder.pt'),
                                    map_location=get_cpu_device())
             model.encoder.super_load_state_dict(encoder_w, strict=True)
@@ -1715,6 +1726,12 @@ def _get_model_params_for_opt(args, model):
     architecture = args.model['encoder_name']
     assert architecture in constants.BACKBONES
 
+    if args.method in [constants.METHOD_TSCAM, constants.METHOD_SAT, constants.METHOD_ENERGY]:
+        if 'deit' in architecture:
+            return [
+                {'params': model.parameters(), 'lr': hparams.lr}
+            ]
+    
     if not sp_method:
         _FEATURE_PARAM_LAYER_PATTERNS = {
             'vgg': ['encoder.features.'],  # features
@@ -1724,10 +1741,7 @@ def _get_model_params_for_opt(args, model):
                           'encoder.Conv2d_3', 'encoder.Conv2d_4'],  # features
         }
 
-    if args.method in [constants.METHOD_TSCAM, constants.METHOD_SAT]:
-        return [
-            {'params': model.parameters(), 'lr': hparams.lr}
-        ]
+   
 
 
     param_features = []

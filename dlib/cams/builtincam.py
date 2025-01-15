@@ -17,6 +17,7 @@ from dlib.stdcl.classifier import STDClassifier
 from dlib.unet.model import UnetFCAM
 from dlib.unet.model import UnetNEGEV
 from dlib.unet.model import Unet
+from dlib.div_classifiers.sat import SAT
 
 from  dlib.configure import constants
 
@@ -553,18 +554,18 @@ class EnergyCAM:
         self.dataset = dataset
 
     @staticmethod
-    def assert_model(model: Union[STDClassifier, UnetFCAM, Unet]) -> None:
+    def assert_model(model: Union[STDClassifier, UnetFCAM, Unet, SAT]) -> None:
         # _model = model if not isinstance(model, DDP) else model.module
 
         _model = model
 
         # assert isinstance(_model, UnetFCAM), type(model)
 
-        assert any([isinstance(_model.encoder,
-                               dlib.encoders.resnet.ResNetEncoder),
-                    isinstance(_model.encoder, dlib.encoders.vgg.VGGEncoder),
-                    isinstance(_model.encoder,
-                               dlib.encoders.inceptionv3.InceptionV3Encoder)])
+        # assert any([isinstance(_model.encoder,
+        #                        dlib.encoders.resnet.ResNetEncoder),
+        #             isinstance(_model.encoder, dlib.encoders.vgg.VGGEncoder),
+        #             isinstance(_model.encoder,
+        #                        dlib.encoders.inceptionv3.InceptionV3Encoder)])
 
     @staticmethod
     def _normalize(cams: Tensor, spatial_dims: Optional[int] = None) -> Tensor:

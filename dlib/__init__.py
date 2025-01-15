@@ -64,7 +64,7 @@ def create_model(
     elif arch == constants.SATCLASSIFIER:
         assert encoder_name in constants.SAT_BACKBONES
         assert task == constants.STD_CL
-        assert method == constants.METHOD_SAT
+        #assert method == constants.METHOD_SAT
         return div_classifiers.models[method][encoder_name](
             encoder_weights, **kwargs)
 

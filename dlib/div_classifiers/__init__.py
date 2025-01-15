@@ -27,6 +27,8 @@ from dlib.div_classifiers.sat import deit_sat_tiny_patch16_224
 from dlib.div_classifiers.sat import deit_sat_base_patch16_224
 from dlib.div_classifiers.sat import deit_sat_small_patch16_224
 
+from dlib.div_classifiers.sat import SAT
+
 from dlib.configure import constants
 
 models = dict()
@@ -63,4 +65,13 @@ models[constants.METHOD_SAT][
 models[constants.METHOD_SAT][
     constants.DEIT_SAT_SMALL_P16_224] = deit_sat_small_patch16_224
 models[constants.METHOD_SAT][
+    constants.DEIT_SAT_BASE_P16_224] = deit_sat_base_patch16_224
+
+
+models[constants.METHOD_ENERGY] = dict()
+models[constants.METHOD_ENERGY][
+    constants.DEIT_SAT_TINY_P16_224] = deit_sat_tiny_patch16_224
+models[constants.METHOD_ENERGY][
+    constants.DEIT_SAT_SMALL_P16_224] = deit_sat_small_patch16_224
+models[constants.METHOD_ENERGY][
     constants.DEIT_SAT_BASE_P16_224] = deit_sat_base_patch16_224
