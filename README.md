@@ -36,12 +36,13 @@ Implemented WSOL methods:
 - ADL
 - CutMix
 - TS-CAM
-- MAXMIN  -- Please use the original implementation https://github.com/sbelharbi/deep-wsl-histo-min-max-uncertainty
+- SAT
 - NEGEV
 - GradCAM
 - GradCAM++
 - Smooth-GradCAM++
 - LayerCAM
+- PixelCAM
 - U-Net
 
 #### <a name='reqs'> Requirements</a>:
