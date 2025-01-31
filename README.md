@@ -18,6 +18,9 @@ Please create a github issue.
 * [Datasets](#datasets)
 * [Run code](#run)
 
+#### <a name='view'> Method</a>:
+<!-- <img src="doc/proposal.pdf" alt="view" width="600"> -->
+
 
 Implemented WSOL methods:
 - GAP
