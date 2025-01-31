@@ -20,7 +20,7 @@ Please create a github issue.
 
 #### <a name='view'> Method</a>:
 <!-- <img src="doc/proposal.pdf" alt="view" width="600"> -->
-<img src="doc/proposal.pdf" alt="PixelCAM" width="600">
+<img src="doc/proposal.png" alt="PixelCAM" width="600">
 
 Implemented WSOL methods:
 - GAP
