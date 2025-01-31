@@ -116,7 +116,7 @@ python main.py \
        --eval_checkpoint_type best_localization \
        --opt__step_size 5 \
        --opt__gamma 0.1 \
-       --max_epochs 20 \
+       --max_epochs 1000 \
        --freeze_cl False \
        --support_background True \
        --method LayerCAM \
