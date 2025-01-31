@@ -1,9 +1,9 @@
-DLLL 2025-01-14 16:28:48.301667 0:00:17.040504 
-==============================================================================================================
- TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: CAMELYON512 	 METHOD: SAT 	 ENCODER: DEIT_SAT_TINY_PATCH16_224 	
-==============================================================================================================
+DLLL 2025-01-17 21:17:29.031097 0:00:02.374565 
+=======================================================================================================
+ TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: GLAS 	 METHOD: SAT 	 ENCODER: DEIT_SAT_TINY_PATCH16_224 	
+=======================================================================================================
 
-DLLL 2025-01-14 16:28:48.492660 0:00:17.231497 `SAT(
+DLLL 2025-01-17 21:17:29.231091 0:00:02.574559 `SAT(
   (patch_embed): PatchEmbed(
     (proj): Conv2d(3, 192, kernel_size=(16, 16), stride=(16, 16))
   )
@@ -218,7 +218,7 @@ DLLL 2025-01-14 16:28:48.492660 0:00:17.231497 `SAT(
   (head): Conv2d(192, 2, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
   (avgpool): AdaptiveAvgPool2d(output_size=1)
 )` was created. Nbr.params: 5528267
-DLLL 2025-01-14 16:28:48.492887 0:00:17.231724 Arch: SATClassifier
+DLLL 2025-01-17 21:17:29.231247 0:00:02.574715 Arch: SATClassifier
 task: STD_CL
 encoder_name: deit_sat_tiny_patch16_224
 encoder_weights: imagenet
@@ -230,7 +230,7 @@ freeze_cl: False
 im_rec: False
 img_range: tanh 
 
-DLLL 2025-01-14 16:28:48.495100 0:00:17.233937 SAT(
+DLLL 2025-01-17 21:17:29.233575 0:00:02.577043 SAT(
   (patch_embed): PatchEmbed(
     (proj): Conv2d(3, 192, kernel_size=(16, 16), stride=(16, 16))
   )
@@ -449,8 +449,8 @@ DLLL 2025-01-14 16:28:48.495100 0:00:17.233937 SAT(
 	Encoder [u-deit_sat_tiny_patch16_224]: 5528267. 
 	Total: 5528267. 
 
-DLLL 2025-01-14 16:28:57.829058 0:00:26.567895 
+DLLL 2025-01-17 21:17:32.342287 0:00:05.685755 
 ========================================================================================================================
- MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/MODEL_MIDL_2025/SOURCE/CAMELYON/BLOC/ID_SOURCE_20_CAMELYON512_SAT_8-TSK_STD_CL-DS_CAMELYON512-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_SAT-SPOOLING_GAP-ARCH_SATCLASSIFIER-ECD_DEIT_SAT_TINY_PATCH16_224/CAMELYON512-0-DEIT_SAT_TINY_PATCH16_224-SAT-GAP-CP_BEST_LOCALIZATION
+ MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/MODEL_MIDL_2025/SOURCE/GLAS/BCL/ID_SOURCE_5_GLAS_SAT_150-TSK_STD_CL-DS_GLAS-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_SAT-SPOOLING_GAP-ARCH_SATCLASSIFIER-ECD_DEIT_SAT_TINY_PATCH16_224/GLAS-0-DEIT_SAT_TINY_PATCH16_224-SAT-GAP-CP_BEST_CLASSIFICATION
 ========================================================================================================================
 

@@ -11,3 +11,4 @@ pretrained/*
 data_cams/*
 visualization/*
 tmp_outd/*
+scripts/

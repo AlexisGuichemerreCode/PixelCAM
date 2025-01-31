@@ -318,6 +318,24 @@ class SAT(VisionTransformer):
             
         return x_logits
     
+    @staticmethod
+    def freeze_part(part):
+
+        for module in (part.modules()):
+
+            for param in module.parameters():
+                param.requires_grad = False
+
+            if isinstance(module, torch.nn.BatchNorm2d):
+                module.eval()
+
+            if isinstance(module, torch.nn.Dropout):
+                module.eval()
+
+    def freeze_cl_hypothesis(self):
+        # SFUDA: freeze the last linear weights + bias of the classifier
+        self.freeze_part(self.head)
+        
     def flush(self):
         self.encoder_last_features = None
         self.cams = None

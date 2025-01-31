@@ -1590,7 +1590,8 @@ def sf_uda_load_set_source_weights(model, args: object):
     path = fd
     cpu_device = get_cpu_device()
     spec_mth = [constants.METHOD_SPG, constants.METHOD_ACOL,
-                constants.METHOD_ADL, constants.METHOD_TSCAM]
+                constants.METHOD_ADL, constants.METHOD_TSCAM,
+                constants.METHOD_SAT]
 
     if args.task == constants.STD_CL:
         if args.method in spec_mth:
@@ -1598,17 +1599,22 @@ def sf_uda_load_set_source_weights(model, args: object):
                                  map_location=get_cpu_device())
             model.load_state_dict(weights, strict=True)
         else:
-            weights = torch.load(join(path, 'encoder.pt'),
-                                 map_location=cpu_device)
-            model.encoder.super_load_state_dict(weights, strict=True)
+            if args.method == constants.METHOD_ENERGY and   'deit' in args.model['encoder_name']:
+                weights = torch.load(join(path, 'model.pt'),
+                                 map_location=get_cpu_device())
+                model.load_state_dict(weights, strict=True)
+            else:
+                weights = torch.load(join(path, 'encoder.pt'),
+                                    map_location=cpu_device)
+                model.encoder.super_load_state_dict(weights, strict=True)
 
-            weights = torch.load(join(path, 'classification_head.pt'),
-                                 map_location=cpu_device)
-            model.classification_head.load_state_dict(weights, strict=True)
-            if args.method == constants.METHOD_ENERGY:
-                weights = torch.load(join(path, 'pixel_wise_classification_head.pt'),
-                                     map_location=cpu_device)
-                model.pixel_wise_classification_head.load_state_dict(weights, strict=True)
+                weights = torch.load(join(path, 'classification_head.pt'),
+                                    map_location=cpu_device)
+                model.classification_head.load_state_dict(weights, strict=True)
+                if args.method == constants.METHOD_ENERGY:
+                    weights = torch.load(join(path, 'pixel_wise_classification_head.pt'),
+                                        map_location=cpu_device)
+                    model.pixel_wise_classification_head.load_state_dict(weights, strict=True)
 
     elif args.task == constants.F_CL:
         weights = torch.load(join(path, 'encoder.pt'),

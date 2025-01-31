@@ -1,10 +1,58 @@
-DLLL 2024-11-27 13:57:43.542804 0:00:00.050550 
-============================================================================================
- TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: GLAS 	 METHOD: GRADCAMPP 	 ENCODER: RESNET50 	
-============================================================================================
+DLLL 2025-01-30 19:00:37.397042 0:00:00.104565 
+===================================================================================================
+ TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: CAMELYON512 	 METHOD: ENERGYCAM 	 ENCODER: RESNET50 	
+===================================================================================================
 
-DLLL 2024-11-27 13:57:43.960415 0:00:00.468161 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 23514179
-DLLL 2024-11-27 13:57:43.960495 0:00:00.468241 Arch: STDClassifier
+DLLL 2025-01-30 19:00:37.892507 0:00:00.600030 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 24041030
+DLLL 2025-01-30 19:00:37.892605 0:00:00.600128 Arch: STDClassifier
+task: STD_CL
+encoder_name: resnet50
+encoder_weights: imagenet
+classes: 2
+aux_params: 
+	classes: 2
+	modalities: 5
+	kmax: 0.5
+	kmin: 0.1
+	alpha: 0.6
+	dropout: 0.0
+	support_background: False
+	freeze_cl: False
+	r: 10.0
+	mid_channels: 128
+	gated: True
+	prm_ks: 3
+	prm_st: 1
+	pixel_wise_classification: True
+	batch_norm: False
+	multiple_layer: False
+	one_layer: False
+	anchors_ortogonal: False
+	detach_pixel_classifier: False
+scale_in: 1.0
+freeze_cl: False
+im_rec: False
+img_range: tanh 
+
+DLLL 2025-01-30 19:00:37.895800 0:00:00.603323 u-resnet50. Task: STD_CL. 
+ NBR-PARAMS: 
+	Encoder [resnet50]: 23508032. 
+	Classification head [DeepMIL]: 528900. 
+	Pixel Wise Classification head [PixelWise]: 4098. 
+	Total: 24041030. 
+
+DLLL 2025-01-30 19:00:40.496604 0:00:03.204127 
+========================================================================================================================
+ MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/MODEL_MIDL_2025/SOURCE/CAMELYON/BLOC/ID_SOURCE_3_CAMELYON512_ENERGYCAM_DEEPMIL_LOW_RES_5-TSK_STD_CL-DS_CAMELYON512-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_ENERGYCAM-SPOOLING_DEEPMIL-ARCH_STDCLASSIFIER-ECD_RESNET50/CAMELYON512-0-RESNET50-ENERGYCAM-DEEPMIL-CP_BEST_LOCALIZATION
+========================================================================================================================
+
+DLLL 2025-01-30 19:01:32.200127 0:00:54.907650 
+===================================================================================================
+ TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: CAMELYON512 	 METHOD: ENERGYCAM 	 ENCODER: RESNET50 	
+===================================================================================================
+
+DLLL 2025-01-30 19:01:32.676241 0:00:55.383764 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 23518277
+DLLL 2025-01-30 19:01:32.676328 0:00:55.383851 Arch: STDClassifier
 task: STD_CL
 encoder_name: resnet50
 encoder_weights: imagenet
@@ -17,24 +65,556 @@ aux_params:
 	alpha: 0.6
 	dropout: 0.0
 	support_background: True
+	freeze_cl: False
 	r: 10.0
 	mid_channels: 128
 	gated: False
 	prm_ks: 3
 	prm_st: 1
+	pixel_wise_classification: True
+	batch_norm: False
+	multiple_layer: False
+	one_layer: False
+	anchors_ortogonal: False
+	detach_pixel_classifier: False
 scale_in: 1.0
 freeze_cl: False
 im_rec: False
 img_range: tanh 
 
-DLLL 2024-11-27 13:57:43.962353 0:00:00.470099 u-resnet50. Task: STD_CL. 
+DLLL 2025-01-30 19:01:32.680933 0:00:55.388456 u-resnet50. Task: STD_CL. 
  NBR-PARAMS: 
 	Encoder [resnet50]: 23508032. 
 	Classification head [WGAP]: 6147. 
-	Total: 23514179. 
+	Pixel Wise Classification head [PixelWise]: 4098. 
+	Total: 23518277. 
 
-DLLL 2024-11-27 13:57:44.011775 0:00:00.519521 
+DLLL 2025-01-30 19:01:33.859407 0:00:56.566930 
 ========================================================================================================================
- MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/HISTOLOGY_PROJECT/MODEL_BENCHMARK_SFUDA/SOURCE_MODELS/BLOC/GLAS/ID_SOURCE_10_GLAS_GRADCAMPP_350-TSK_STD_CL-DS_GLAS-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_GRADCAMPP-SPOOLING_WGAP-ARCH_STDCLASSIFIER-ECD_RESNET50/GLAS-0-RESNET50-GRADCAMPP-WGAP-CP_BEST_LOCALIZATION
+ MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/MODEL_MIDL_2025/SOURCE/CAMELYON/BLOC/ID_SOURCE_0_CAMELYON512_ENERGYCAM_GRADCAMPP_LOW_RES_2-TSK_STD_CL-DS_CAMELYON512-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_ENERGYCAM-SPOOLING_WGAP-ARCH_STDCLASSIFIER-ECD_RESNET50/CAMELYON512-0-RESNET50-ENERGYCAM-WGAP-CP_BEST_LOCALIZATION
+========================================================================================================================
+
+DLLL 2025-01-30 19:02:21.614869 0:01:44.322392 
+===================================================================================================
+ TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: CAMELYON512 	 METHOD: ENERGYCAM 	 ENCODER: RESNET50 	
+===================================================================================================
+
+DLLL 2025-01-30 19:02:22.186238 0:01:44.893761 `u-resnet50. Task: STD_CL.` was created. Nbr.params: 23518277
+DLLL 2025-01-30 19:02:22.186408 0:01:44.893931 Arch: STDClassifier
+task: STD_CL
+encoder_name: resnet50
+encoder_weights: imagenet
+classes: 2
+aux_params: 
+	classes: 2
+	modalities: 5
+	kmax: 0.5
+	kmin: 0.1
+	alpha: 0.6
+	dropout: 0.0
+	support_background: True
+	freeze_cl: False
+	r: 10.0
+	mid_channels: 128
+	gated: False
+	prm_ks: 3
+	prm_st: 1
+	pixel_wise_classification: True
+	batch_norm: False
+	multiple_layer: False
+	one_layer: False
+	anchors_ortogonal: False
+	detach_pixel_classifier: False
+scale_in: 1.0
+freeze_cl: False
+im_rec: False
+img_range: tanh 
+
+DLLL 2025-01-30 19:02:22.189308 0:01:44.896831 u-resnet50. Task: STD_CL. 
+ NBR-PARAMS: 
+	Encoder [resnet50]: 23508032. 
+	Classification head [WGAP]: 6147. 
+	Pixel Wise Classification head [PixelWise]: 4098. 
+	Total: 23518277. 
+
+DLLL 2025-01-30 19:02:25.035362 0:01:47.742885 
+========================================================================================================================
+ MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/MODEL_MIDL_2025/SOURCE/CAMELYON/BLOC/ID_SOURCE_0_CAMELYON512_ENERGYCAM_LAYERCAM_LOW_RES_2-TSK_STD_CL-DS_CAMELYON512-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_ENERGYCAM-SPOOLING_WGAP-ARCH_STDCLASSIFIER-ECD_RESNET50/CAMELYON512-0-RESNET50-ENERGYCAM-WGAP-CP_BEST_LOCALIZATION
+========================================================================================================================
+
+DLLL 2025-01-30 19:03:12.695000 0:02:35.402523 
+====================================================================================================================
+ TASK: STD_CL 	 BOX_V2_METRIC: FALSE 	DATASET: CAMELYON512 	 METHOD: ENERGYCAM 	 ENCODER: DEIT_SAT_TINY_PATCH16_224 	
+====================================================================================================================
+
+DLLL 2025-01-30 19:03:12.863388 0:02:35.570911 `SAT(
+  (patch_embed): PatchEmbed(
+    (proj): Conv2d(3, 192, kernel_size=(16, 16), stride=(16, 16))
+  )
+  (pos_drop): Dropout(p=0.0, inplace=False)
+  (blocks): ModuleList(
+    (0): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): Identity()
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (1): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.009)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (2): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.018)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (3): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.027)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (4): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.036)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (5): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.045)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (6): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.055)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (7): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.064)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (8): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.073)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (9): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.082)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (10): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.091)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (11): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.100)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+  )
+  (norm): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+  (head): Conv2d(192, 2, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (avgpool): AdaptiveAvgPool2d(output_size=1)
+  (pixel_wise_classification_head): PixelWise(in_channels=192, classes=2, support_background=False)
+)` was created. Nbr.params: 5528653
+DLLL 2025-01-30 19:03:12.863601 0:02:35.571124 Arch: SATClassifier
+task: STD_CL
+encoder_name: deit_sat_tiny_patch16_224
+encoder_weights: imagenet
+classes: 2
+aux_params: 
+	classes: 2
+	modalities: 5
+	kmax: 0.5
+	kmin: 0.1
+	alpha: 0.6
+	dropout: 0.0
+	support_background: False
+	freeze_cl: False
+	r: 10.0
+	mid_channels: 128
+	gated: False
+	prm_ks: 3
+	prm_st: 1
+	pixel_wise_classification: True
+	batch_norm: False
+	multiple_layer: False
+	one_layer: False
+	anchors_ortogonal: False
+	detach_pixel_classifier: False
+scale_in: 1.0
+freeze_cl: False
+im_rec: False
+img_range: tanh 
+
+DLLL 2025-01-30 19:03:12.866098 0:02:35.573621 SAT(
+  (patch_embed): PatchEmbed(
+    (proj): Conv2d(3, 192, kernel_size=(16, 16), stride=(16, 16))
+  )
+  (pos_drop): Dropout(p=0.0, inplace=False)
+  (blocks): ModuleList(
+    (0): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): Identity()
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (1): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.009)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (2): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.018)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (3): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.027)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (4): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.036)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (5): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.045)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (6): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.055)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (7): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.064)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (8): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.073)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (9): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.082)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (10): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.091)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (11): Block(
+      (norm1): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=192, out_features=576, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=192, out_features=192, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.100)
+      (norm2): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=192, out_features=768, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=768, out_features=192, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+  )
+  (norm): LayerNorm((192,), eps=1e-06, elementwise_affine=True)
+  (head): Conv2d(192, 2, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (avgpool): AdaptiveAvgPool2d(output_size=1)
+  (pixel_wise_classification_head): PixelWise(in_channels=192, classes=2, support_background=False)
+) 
+ NBR-PARAMS: 
+	Encoder [u-deit_sat_tiny_patch16_224]: 5528653. 
+	Total: 5528653. 
+
+DLLL 2025-01-30 19:03:13.533202 0:02:36.240725 
+========================================================================================================================
+ MODEL CHECKPOINT LOADED FROM /EXPORT/LIVIA/HOME/VISION/AGUICHEMERRE/MODEL_MIDL_2025/SOURCE/CAMELYON/BLOC/ID_SOURCE_2_CAMELYON512_ENERGYCAM_SAT_LOW_RES_5-TSK_STD_CL-DS_CAMELYON512-FOLD_0-MAG_NONE-RUNMODE_SEARCH-MODE-MTH_ENERGYCAM-SPOOLING_GAP-ARCH_SATCLASSIFIER-ECD_DEIT_SAT_TINY_PATCH16_224/CAMELYON512-0-DEIT_SAT_TINY_PATCH16_224-ENERGYCAM-GAP-CP_BEST_LOCALIZATION
 ========================================================================================================================
 

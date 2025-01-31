@@ -362,6 +362,33 @@ class CAMComputer(object):
             #     self.evaluator.accumulate(cam_normalized, image_id)
 
         return self.evaluator.compute()
+    
+    def compute_and_evaluate_cams_one_image(self, images, targets, image_ids, image_size):
+        print("Computing and evaluating cams.")
+        self.fix_random()
+
+        images = images.cuda()
+
+
+        self.minibatch_accum(images=images,
+                                targets=targets,
+                                image_ids=image_ids,
+                                image_size=image_size
+                                )
+
+            # # cams shape (batchsize, h, w)..
+            # for cam, image_id in zip(cams, image_ids):
+            #     # cams shape (h, w).
+            #     assert cam.shape == image_size
+            #
+            #     # cam_resized = cv2.resize(cam, image_size,
+            #     #                          interpolation=cv2.INTER_CUBIC)
+            #
+            #     cam_resized = cam
+            #     cam_normalized = self.normalizecam(cam_resized)
+            #     self.evaluator.accumulate(cam_normalized, image_id)
+
+        return self.evaluator.compute()
 
     def build_bbox(self, scoremap, image_id, tau: float):
         cam_threshold_list = [tau]
