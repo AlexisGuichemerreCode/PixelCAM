@@ -1,43 +1,13 @@
-# [Source-Free Domain Adaptation of Weakly-Supervised Object Localization Models for Histology (CVPRw 2024)](https://arxiv.org/pdf/2404.19113.pdf)
-by **Alexis Guichemerre<sup>1</sup>, Soufiane Belharbi<sup>1</sup>, Tsiry Mayet<sup>2</sup>, Shakeeb Murtaza<sup>1</sup>, Pourya Shamsolmoali<sup>3</sup>, Luke McCaffrey<sup>4</sup>, Eric Granger<sup>1</sup>**
+# [PixelCAM: Pixel Class Activation Mapping for Histology Image Classification and ROI Localization]
+by **Alexis Guichemerre<sup>1</sup>, Soufiane Belharbi<sup>1</sup>, mohammadhadi.shater<sup>1</sup>, Luke McCaffrey<sup>4</sup>, Eric Granger<sup>1</sup>**
 <br/>
-<sup>1</sup> LIVIA, Dept. of Systems Engineering, ÉTS, Montreal, Canada
-<br/>
-<sup>2</sup> LITIS UR 4108, F-746000, INSA Rouen Normandie, France
-<br/>
-<sup>3</sup> SEECS, Queen’s University Belfast, UK
+<sup>1</sup> LIVIA, ILLS, Dept. of Systems Engineering, ÉTS, Montreal, Canada
 <br/>
 <sup>4</sup> Goodman Cancer Research Centre, Dept. of Oncology, McGill University, Montreal, Canada
 
 ## Abstract
 
-Given the emergence of deep learning, digital pathology
-has gained popularity for cancer diagnosis based on his-
-tology images. Deep weakly supervised object localization
-(WSOL) models can be trained to classify histology images
-according to cancer grade and identify regions of interest
-(ROIs) for interpretation, using inexpensive global image-
-class annotations. A WSOL model initially trained on some
-labeled source image data can be adapted using unlabeled
-target data in cases of significant domain shifts caused by
-variations in staining, scanners, and cancer type. In this pa-
-per, we focus on source-free (unsupervised) domain adap-
-tation (SFDA), a challenging problem where a pre-trained
-source model is adapted to a new target domain without
-using any source domain data for privacy and efficiency
-reasons. SFDA of WSOL models raises several challenges
-in histology, most notably because they are not intended to
-adapt for both classification and localization tasks. In this
-paper, 4 state-of-the-art SFDA methods, each one repre-
-sentative of a main SFDA family, are compared for WSOL
-in terms of classification and localization accuracy. They
-are the SFDA-Distribution Estimation, Source HypOthesis
-Transfer, Cross-Domain Contrastive Learning, and Adap-
-tively Domain Statistics Alignment. Experimental results on
-the challenging Glas (smaller, breast cancer) and Came-
-lyon16 (larger, colon cancer) histology datasets indicate
-that these SFDA methods typically perform poorly for local-
-ization after adaptation when optimized for classification.
+Weakly supervised object localization (WSOL) allows to classify an image and localize ROIs. WSOL only require low-cost annotation, yet provides an interpretable classifier which is critical in histology image analysis. Standard WSOL methods rely on Class Activation Mapping (CAM) methods to produce spatial localization maps according to a single- or two-step strategy. While both strategies have led to significant progress, they still face several limitations with histology images. Single-step methods can easily result in under- or over-activation due to the inherent challenges of histology images and the lack of localization cues, while also facing the well-known issue of asynchronous convergence between the two tasks. The two-step approach is sub-optimal because it is tied to a frozen classifier, limiting the capacity for localization. Moreover, these methods tend to break down when applied to out-of-distribution (OOD) datasets.In this paper, a novel multi-task approach for WSOL is introduced for simultaneous training of both tasks, classification and localization. In particular, we consider performing localization in the pixel-feature space of an image encoder that is shared for classification. This allows learning discriminant features and accurate delineation of foreground/background regions to support ROI localization and image classification. To this end, we propose \pixelcam, a cost-effective foreground/background pixel-wise classifier in the pixel-feature space allowing spatial object localization. Using partial-cross entropy, PixelCAM is trained using pixel pseudo-labels collected from a pretrained WSOL model. Both image and pixel-wise classifiers are trained simultaneously using standard gradient descent. Our extensive experimentson GlaS and CAMELYON16 cancer datasets show that \pixelcam can significantly improve classification and localization performance when integrated with different WSOL methods. Most importantly, it provides robustness on both tasks for OOD problems linked to different cancer types, with large domain shifts between training and testing image data.
 
 ### Issues:
 Please create a github issue.
@@ -77,15 +47,8 @@ Implemented WSOL methods:
 - LayerCAM
 - U-Net
 
-Implemented SFUDA methods:
-- SFDA-DE [[paper]](https://arxiv.org/abs/2204.11257)
-- SHOT [[paper]](https://arxiv.org/abs/2002.08546)
-- CDCL [[paper]](https://arxiv.org/abs/2106.05528)
-- AdaDSA [[paper]](https://ieeexplore.ieee.org/document/9684410)
 
-These methods have been integrated with all CAM-based methods except maxmin, 
-negev, and fcam. The integration covers all architectures: Resnet50, VGG16, 
-InceptionV3.
+
 <!-- 
 #### <a name='results'> Results</a>:
 
@@ -146,11 +109,11 @@ You find the splits in [./folds](./folds).
 
 #### <a name="run"> Run code </a>:
 
-E.g. SHOT method via CAM WSOL method.
+E.g. PixelCAM method via CAM WSOL method.
 
-1- Train on source data CAMELYON512:
+1- Train on data GlaS:
 
-* CAM-method: CAM over CAMELYON512 using ResNet50:
+* LayerCAM-method: LayerCAM over GlaS using ResNet50:
 ```shell
 #!/usr/bin/env bash 
  
@@ -178,9 +141,9 @@ python main.py \
        --max_epochs 20 \
        --freeze_cl False \
        --support_background True \
-       --method CAM \
+       --method LayerCAM \
        --spatial_pooling WGAP \
-       --dataset CAMELYON512 \
+       --dataset GLAS \
        --fold 0 \
        --cudaid $cudaid \
        --debug_subfolder None \
@@ -191,13 +154,14 @@ python main.py \
 ```
 
 From the folder of the experiment `01_02_2024_09_23_52_900932__4871059`, 
-copy one of the checkpoints folders to the folder `source_models` (constants.
-SOURCE_MODELS_FD) located here `./source_models`: 
-`CAMELYON512-0-resnet50-CAM-WGAP-cp_best_localization` or 
-`CAMELYON512-0-resnet50-CAM-WGAP-cp_best_classification`.
+copy one of the checkpoints folders to the folder `pretrained` 
+`GlaS-0-resnet50-LayerCAM-WGAP-cp_best_localization` or 
+`GlaS-0-resnet50-LayerCAM-WGAP-cp_best_classification`.
 
-2- Train on target data GLAS: 
-#### E.g. of SHOT method.
+Store the CAMs of the training dataset in the folder data_cams
+
+2- Train PixelCAM on data GlaS: 
+
 ```shell
 #!/usr/bin/env bash 
  
@@ -225,7 +189,7 @@ python main.py \
        --max_epochs 1000 \
        --freeze_cl False \
        --support_background True \
-       --method CAM \
+       --method PixelCAM \
        --spatial_pooling WGAP \
        --dataset GLAS \
        --fold 0 \
@@ -233,184 +197,14 @@ python main.py \
        --debug_subfolder None \
        --amp True \
        --opt__lr 0.001 \
-       --sf_uda True \
-       --sf_uda_source_ds CAMELYON512 \
-       --sf_uda_source_ds_fold 0 \
-       --sf_uda_source_encoder_name resnet50 \
-       --sf_uda_source_checkpoint_type best_localization \
-       --sf_uda_source_wsol_method CAM \
-       --sf_uda_source_wsol_arch STDClassifier \
-       --sf_uda_source_wsol_spatial_pooling WGAP \
-       --shot True \
-       --shot_freq_epoch 1 \
-       --shot_dist_type cosine \
-       --ent_pseudo_lb True \
-       --ent_pseudo_lb_lambda 0.3 \
-       --div_pseudo_lb True \
-       --div_pseudo_lb_lambda 0.1 \
-       --ce_pseudo_lb True \
-       --ce_pseudo_lb_lambda 0.3 \
-       --ce_pseudo_lb_smooth 0.1 \
+       --ece True \
+       --ece_lambda 1.0 \
+       --neg_samples_partial False \
+       --sl_pc_seeder probability_negative_salloarea_seeder \
+       --sl_min 5 \
+       --sl_max 5 \
+       --sl_min_p 0.4 \
+       --path_cam  resnet50-layercam-bloc-glas \
+       --path_pre_trained_model_cl GLAS-0-resnet50-LayerCAM-WGAP-cp_best_classification \
        --exp_id 01_12_2024_09_25_14_467534__5485897
-```
-
-#### E.g. of SFDA-DE method.
-```shell
-#!/usr/bin/env bash 
- 
-CONDA_BASE=$(conda info --base) 
-source $CONDA_BASE/etc/profile.d/conda.sh
-conda activate da
-
-# ==============================================================================
-cudaid=$1
-export CUDA_VISIBLE_DEVICES=$cudaid
-
-export OMP_NUM_THREADS=50
-python main.py \
-       --task STD_CL \
-       --encoder_name resnet50 \
-       --arch STDClassifier \
-       --spatial_dropout 0.1 \
-       --runmode search-mode \
-       --opt__name_optimizer sgd \
-       --batch_size 32 \
-       --eval_batch_size 64 \
-       --eval_checkpoint_type best_localization \
-       --opt__step_size 5 \
-       --opt__gamma 0.1 \
-       --max_epochs 1000 \
-       --freeze_cl False \
-       --support_background True \
-       --method CAM \
-       --spatial_pooling WGAP \
-       --dataset GLAS \
-       --fold 0 \
-       --cudaid $cudaid \
-       --debug_subfolder None \
-       --amp True \
-       --opt__lr 0.001 \
-       --sf_uda True \
-       --sf_uda_source_ds CAMELYON512 \
-       --sf_uda_source_ds_fold 0 \
-       --sf_uda_source_encoder_name resnet50 \
-       --sf_uda_source_checkpoint_type best_localization \
-       --sf_uda_source_wsol_method CAM \
-       --sf_uda_source_wsol_arch STDClassifier \
-       --sf_uda_source_wsol_spatial_pooling WGAP \
-       --sfde True \
-       --cdd_pseudo_lb True \
-       --cdd_variance 1.5 \
-       --cdd_lambda 0.001 \
-       --sfde_threshold 0.8 \
-       --exp_id 01_12_2024_09_25_14_467534__5485897
-```
-
-#### E.g. of CDCL method.
-```shell
-#!/usr/bin/env bash 
- 
-CONDA_BASE=$(conda info --base) 
-source $CONDA_BASE/etc/profile.d/conda.sh
-conda activate da
-
-# ==============================================================================
-cudaid=$1
-export CUDA_VISIBLE_DEVICES=$cudaid
-
-export OMP_NUM_THREADS=50
-python main.py \
-       --task STD_CL \
-       --encoder_name resnet50 \
-       --arch STDClassifier \
-       --spatial_dropout 0.1 \
-       --runmode search-mode \
-       --opt__name_optimizer sgd \
-       --batch_size 32 \
-       --eval_batch_size 64 \
-       --eval_checkpoint_type best_localization \
-       --opt__step_size 5 \
-       --opt__gamma 0.1 \
-       --max_epochs 1000 \
-       --freeze_cl False \
-       --support_background True \
-       --method CAM \
-       --spatial_pooling WGAP \
-       --dataset GLAS \
-       --fold 0 \
-       --cudaid $cudaid \
-       --debug_subfolder None \
-       --amp True \
-       --opt__lr 0.001 \
-       --sf_uda True \
-       --sf_uda_source_ds CAMELYON512 \
-       --sf_uda_source_ds_fold 0 \
-       --sf_uda_source_encoder_name resnet50 \
-       --sf_uda_source_checkpoint_type best_localization \
-       --sf_uda_source_wsol_method CAM \
-       --sf_uda_source_wsol_arch STDClassifier \
-       --sf_uda_source_wsol_spatial_pooling WGAP \
-       --cdcl True \
-       --cdcl_pseudo_lb True \
-       --cdcl_tau 0.04 \
-       --cdcl_lambda 0.001 \
-       --cdcl_threshold 1.0 \
-       --exp_id 01_12_2024_09_25_14_467534__5485897
-```
-
-#### E.g. of AdaDSA method.
-```shell
-#!/usr/bin/env bash 
- 
-CONDA_BASE=$(conda info --base) 
-source $CONDA_BASE/etc/profile.d/conda.sh
-conda activate da
-
-# ==============================================================================
-cudaid=$1
-export CUDA_VISIBLE_DEVICES=$cudaid
-
-export OMP_NUM_THREADS=50
-python main.py \
-       --task STD_CL \
-       --encoder_name resnet50 \
-       --arch STDClassifier \
-       --spatial_dropout 0.1 \
-       --runmode search-mode \
-       --opt__name_optimizer sgd \
-       --batch_size 8 \
-       --eval_batch_size 64 \
-       --eval_checkpoint_type best_localization \
-       --opt__step_size 5 \
-       --opt__gamma 0.1 \
-       --max_epochs 1000 \
-       --freeze_cl False \
-       --support_background True \
-       --method CAM \
-       --spatial_pooling WGAP \
-       --dataset GLAS \
-       --fold 0 \
-       --cudaid $cudaid \
-       --debug_subfolder None \
-       --amp True \
-       --opt__lr 0.001 \
-       --sf_uda True \
-       --sf_uda_source_ds CAMELYON512 \
-       --sf_uda_source_ds_fold 0 \
-       --sf_uda_source_encoder_name resnet50 \
-       --sf_uda_source_checkpoint_type best_localization \
-       --sf_uda_source_wsol_method CAM \
-       --sf_uda_source_wsol_arch STDClassifier \
-       --sf_uda_source_wsol_spatial_pooling WGAP \
-       --shot False \
-       --faust False \
-       --adadsa True \
-       --adadsa_a 10. \
-       --adadsa_eval_batch_size 32 \
-       --ent_pseudo_lb True \
-       --ent_pseudo_lb_lambda 0.3 \
-       --ce_pseudo_lb True \
-       --ce_pseudo_lb_lambda 0.3 \
-       --ce_pseudo_lb_smooth 0.0 \
-       --exp_id 01_12_2024_09_25_14_467534__1485899
 ```
