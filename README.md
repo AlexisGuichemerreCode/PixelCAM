@@ -1,5 +1,5 @@
 # PixelCAM: Pixel Class Activation Mapping for Histology Image Classification and ROI Localization
-by **Alexis Guichemerre<sup>1</sup>, Soufiane Belharbi<sup>1</sup>, mohammadhadi shater<sup>1</sup>, Luke McCaffrey<sup>4</sup>, Eric Granger<sup>1</sup>**
+by **Alexis Guichemerre<sup>1</sup>, Soufiane Belharbi<sup>1</sup>, Mohammadhadi Shater<sup>1</sup>, Luke McCaffrey<sup>4</sup>, Eric Granger<sup>1</sup>**
 <br/>
 <sup>1</sup> LIVIA, ILLS, Dept. of Systems Engineering, ÉTS, Montreal, Canada
 <br/>
