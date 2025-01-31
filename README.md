@@ -19,12 +19,6 @@ Please create a github issue.
 * [Run code](#run)
 
 
-
-#### <a name='view'> Method</a>:
-<!-- <img src="doc/view.png" alt="view" width="600"> -->
-
-<img src="doc/taxo.png" alt="taxonomy" width="600">
-
 Implemented WSOL methods:
 - GAP
 - Max-Pooling
