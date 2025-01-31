@@ -47,26 +47,6 @@ Implemented WSOL methods:
 - LayerCAM
 - U-Net
 
-
-
-<!-- 
-#### <a name='results'> Results</a>:
-
-<img src="doc/per-loc.png" alt="localization performance" width="600">
-
-<img src="doc/sensitivity-thresh.png" alt="localization performance and its sensitivity to thresholding" width="600">
-
-<img src="doc/impact-model-selecion.png" alt="Impact of model selection over localization performance" width="600">
-
-<img src="doc/glas-benign.png" alt="localization GLAS dataset, Benign." width="600">
-
-<img src="doc/glas-malignant.png" alt="localization GLAS dataset, Malignant." width="600">
-
-<img src="doc/camelyon-normal.png" alt="localization Camelyon16 dataset, Normal." width="600">
-
-<img src="doc/camelyon-metastatic.png" alt="localization Camelyon16 dataset, Metastatic." width="600"> -->
-
-
 #### <a name='reqs'> Requirements</a>:
 
 Quick installation to create a virtual environment using conda:
