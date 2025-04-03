@@ -1,16 +1,36 @@
-# PixelCAM: Pixel Class Activation Mapping for Histology Image Classification and ROI Localization
+# [PixelCAM: Pixel Class Activation Mapping for Histology Image Classification and ROI Localization (MIDL2025)](https://arxiv.org/pdf/2503.24135)
 by **Alexis Guichemerre<sup>1</sup>, Soufiane Belharbi<sup>1</sup>, Mohammadhadi Shater<sup>1</sup>, Luke McCaffrey<sup>2</sup>, Eric Granger<sup>1</sup>**
 <br/>
 <sup>1</sup> LIVIA, ILLS, Dept. of Systems Engineering, ÉTS, Montreal, Canada
 <br/>
 <sup>2</sup> Goodman Cancer Research Centre, Dept. of Oncology, McGill University, Montreal, Canada
 
+
+<p align="center"><img src="doc/proposal.png" alt="outline" width="90%"></p>
+
+
+
+[![arXiv](https://img.shields.io/badge/arXiv-2503.24135-b31b1b.svg)](https://arxiv.org/pdf/2503.24135)
+
 ## Abstract
 
-Weakly supervised object localization (WSOL) allows to classify an image and localize ROIs. WSOL only require low-cost annotation, yet provides an interpretable classifier which is critical in histology image analysis. Standard WSOL methods rely on Class Activation Mapping (CAM) methods to produce spatial localization maps according to a single- or two-step strategy. While both strategies have led to significant progress, they still face several limitations with histology images. Single-step methods can easily result in under- or over-activation due to the inherent challenges of histology images and the lack of localization cues, while also facing the well-known issue of asynchronous convergence between the two tasks. The two-step approach is sub-optimal because it is tied to a frozen classifier, limiting the capacity for localization. Moreover, these methods tend to break down when applied to out-of-distribution (OOD) datasets.In this paper, a novel multi-task approach for WSOL is introduced for simultaneous training of both tasks, classification and localization. In particular, we consider performing localization in the pixel-feature space of an image encoder that is shared for classification. This allows learning discriminant features and accurate delineation of foreground/background regions to support ROI localization and image classification. To this end, we propose \pixelcam, a cost-effective foreground/background pixel-wise classifier in the pixel-feature space allowing spatial object localization. Using partial-cross entropy, PixelCAM is trained using pixel pseudo-labels collected from a pretrained WSOL model. Both image and pixel-wise classifiers are trained simultaneously using standard gradient descent. Our extensive experimentson GlaS and CAMELYON16 cancer datasets show that \pixelcam can significantly improve classification and localization performance when integrated with different WSOL methods. Most importantly, it provides robustness on both tasks for OOD problems linked to different cancer types, with large domain shifts between training and testing image data.
+Weakly supervised object localization (WSOL) methods allow training models to classify images and localize ROIs. WSOL only requires low-cost image-class annotations yet provides a visually interpretable classifier, which is important in histology image analysis. Standard WSOL methods rely on class activation mapping (CAM) methods to produce spatial localization maps according to a single- or two-step strategy. While both strategies have made significant progress, they still face several limitations with histology images. Single-step methods can easily result in under- or over-activation due to the limited visual ROI saliency in histology images and the limited localization cues. They also face the well-known issue of asynchronous convergence between classification and localization tasks. The two-step approach is sub-optimal because it is tied to a frozen classifier, limiting the capacity for localization. Moreover, these methods also struggle when applied to out-of-distribution (OOD) datasets.
+In this paper, a multi-task approach for WSOL is introduced for simultaneous training of both tasks to address the asynchronous convergence problem.  In particular, localization is performed in the pixel-feature space of an image encoder that is shared with classification. This allows learning discriminant features and accurate delineation of foreground/background regions to support ROI localization and image classification.
+We propose **PixelCAM**, a cost-effective foreground/background pixel-wise classifier in the pixel-feature space that allows for spatial object localization. Using partial-cross entropy, **PixelCAM** is trained using pixel pseudo-labels collected from a pretrained WSOL model. Both image and pixel-wise classifiers are trained simultaneously using standard gradient descent. In addition, our pixel classifier can easily be integrated into CNN- and transformer-based architectures without any modifications.
+Our extensive experiments on **GlaS** and **CAMELYON16** cancer datasets show that CAMELYON16 can improve classification and localization performance when integrated with different WSOL methods.
+Most importantly, it provides robustness on both tasks for OOD data linked to different cancer types, with large domain shifts between training and testing image data.
 
-### Issues:
-Please create a github issue.
+
+
+## Citation:
+```
+@inproceedings{guichemerre25pixelcam,
+  title={PixelCAM: Pixel Class Activation Mapping for Histology Image Classification and ROI Localization},
+  author={Guichemerre, A. and Belharbi, S. and  Shateri, M. and McCaffrey, L. and Granger, E.},
+  booktitle={MIDL},
+  year={2025}
+}
+```
 
 ### Content:
 * [View](#view)
@@ -19,8 +39,6 @@ Please create a github issue.
 * [Run code](#run)
 
 #### <a name='view'> Method</a>:
-<!-- <img src="doc/proposal.pdf" alt="view" width="600"> -->
-<img src="doc/proposal.png" alt="PixelCAM" width="600">
 
 Implemented WSOL methods:
 - GAP
@@ -92,10 +110,11 @@ E.g. PixelCAM method via CAM WSOL method.
 1- Train on data GlaS:
 
 * LayerCAM-method: LayerCAM over GlaS using ResNet50:
+
 ```shell
-#!/usr/bin/env bash 
- 
-CONDA_BASE=$(conda info --base) 
+#!/usr/bin/env bash
+
+CONDA_BASE=$(conda info --base)
 source $CONDA_BASE/etc/profile.d/conda.sh
 conda activate da
 
@@ -131,19 +150,19 @@ python main.py \
        --exp_id 01_12_2024_09_23_52_900932__4871059
 ```
 
-From the folder of the experiment `01_02_2024_09_23_52_900932__4871059`, 
-copy one of the checkpoints folders to the folder `pretrained` 
-`GlaS-0-resnet50-LayerCAM-WGAP-cp_best_localization` or 
+From the folder of the experiment `01_02_2024_09_23_52_900932__4871059`,
+copy one of the checkpoints folders to the folder `pretrained`
+`GlaS-0-resnet50-LayerCAM-WGAP-cp_best_localization` or
 `GlaS-0-resnet50-LayerCAM-WGAP-cp_best_classification`.
 
 Store the CAMs of the training dataset in the folder data_cams
 
-2- Train PixelCAM on data GlaS: 
+2- Train PixelCAM on data GlaS:
 
 ```shell
-#!/usr/bin/env bash 
- 
-CONDA_BASE=$(conda info --base) 
+#!/usr/bin/env bash
+
+CONDA_BASE=$(conda info --base)
 source $CONDA_BASE/etc/profile.d/conda.sh
 conda activate da
 
